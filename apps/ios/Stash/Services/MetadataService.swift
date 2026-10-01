@@ -231,7 +231,8 @@ enum MetadataEnricher {
             }
             for _ in 0..<4 { start() } // A few at a time is plenty and polite.
             for await (id, result) in group {
-                if let save = context.model(for: id) as? Save { apply(result, to: save) }
+                // Deleted meanwhile (by hand or by a sync) is gone from the context; `model(for:)` would hand back a dead one.
+                if let save: Save = context.registeredModel(for: id), !save.isDeleted { apply(result, to: save) }
                 start()
             }
         }
@@ -248,10 +249,12 @@ enum MetadataEnricher {
             save.author = save.author ?? metadata.author
             if save.source == .web, let type = metadata.contentType { save.contentType = type }
             save.status = .enriched
+            save.touch()
         case .failure(.offline):
             break // Still pending; the next foreground retries.
         case .failure(.unavailable):
             save.status = .failed
+            save.touch()
         }
         // Classify with whatever we now know. Only unclassified saves, so a category is never taken away.
         if save.category == .other, !save.categoryIsManual { save.category = ClassificationService.category(for: save) }

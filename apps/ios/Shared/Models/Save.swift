@@ -46,6 +46,9 @@ final class Save {
     var createdAt: Date
     var lastSavedAt: Date
     var openedAt: Date?
+    /// Last local change, for sync: whatever changed after the last push goes up next time.
+    /// Saves from before sync (and pulled ones) start at 1970, so the first push after signing in sends them.
+    var modifiedAt = Date(timeIntervalSince1970: 0)
 
     init(
         url: URL,
@@ -79,6 +82,12 @@ final class Save {
         self.createdAt = createdAt
         self.lastSavedAt = createdAt
         self.openedAt = openedAt
+        self.modifiedAt = .now
+    }
+
+    /// Every local change calls this, so sync pushes it. Applying pulled rows doesn't.
+    func touch() {
+        modifiedAt = .now
     }
 
     var source: Source {
@@ -100,10 +109,30 @@ final class Save {
     func setCategory(_ category: Category) {
         self.category = category
         categoryIsManual = true
+        touch()
+    }
+
+    /// Seen = opened. Unseen saves are what rediscovery resurfaces.
+    func setSeen(_ seen: Bool) {
+        guard seen != (openedAt != nil) else { return }
+        openedAt = seen ? .now : nil
+        touch()
     }
 
     var status: SaveStatus {
         get { SaveStatus(rawValue: statusRaw) ?? .pending }
         set { statusRaw = newValue.rawValue }
+    }
+}
+
+/// A save deleted while signed in, until sync tells the server.
+@Model
+final class Tombstone {
+    var id: UUID
+    var deletedAt: Date
+
+    init(id: UUID, deletedAt: Date = .now) {
+        self.id = id
+        self.deletedAt = deletedAt
     }
 }

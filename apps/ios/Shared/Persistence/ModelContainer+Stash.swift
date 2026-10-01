@@ -19,6 +19,9 @@ extension ModelContainer {
                 .warning("App Group \(appGroupID) unavailable, using a local store")
             configuration = ModelConfiguration("Stash", groupContainer: .none, cloudKitDatabase: .none)
         }
-        return try ModelContainer(for: Save.self, configurations: configuration)
+        return try ModelContainer(for: Save.self, Tombstone.self, configurations: configuration)
     }
+
+    /// `-sampleData` and tests: never drained into, never synced.
+    var isInMemory: Bool { configurations.contains(where: \.isStoredInMemoryOnly) }
 }

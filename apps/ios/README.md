@@ -15,7 +15,7 @@
 
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
 
-No account, works offline, and your saves stay on your iPhone.
+Works offline and without an account, and your saves stay on your iPhone. Sign in only if you want them synced.
 
 There's also an [Android app](../android). Both do the same things; [REQUIREMENTS.md](../../REQUIREMENTS.md) is the list.
 
@@ -27,6 +27,12 @@ There's also an [Android app](../android). Both do the same things; [REQUIREMENT
 - **Finds anything:** instant search across everything you've saved.
 - **On your Home Screen:** a widget shows one thing you saved. Tap it to open.
 - Cards or a list, light or dark, and your links export in one tap.
+
+## Account and sync (optional)
+
+Stash never asks for an account. If you want your saves on more than one device, sign in or create one with an email and password, on the welcome screen or in *Settings → Account*. Your iPhone keeps its own copy: it syncs when you open or leave the app, on pull to refresh and on **Sync Now**, and keeps working offline.
+
+**Sign Out** keeps every save on the iPhone. **Delete Account** removes the account and the copy on the server, and also keeps your saves on the iPhone.
 
 ## Install
 

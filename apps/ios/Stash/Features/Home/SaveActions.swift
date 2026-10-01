@@ -17,7 +17,7 @@ private struct SaveActions: ViewModifier {
         content
             .contextMenu {
                 Button("Open Original", systemImage: "arrow.up.right") {
-                    save.openedAt = save.openedAt ?? .now
+                    save.setSeen(true)
                     openURL(save.url)
                 }
                 ShareLink(item: save.url)
@@ -34,13 +34,13 @@ private struct SaveActions: ViewModifier {
     private var seenToggle: some View {
         let seen = save.openedAt != nil
         return Button(seen ? "Mark as Unseen" : "Mark as Seen", systemImage: seen ? "eye.slash" : "eye") {
-            save.openedAt = seen ? nil : .now
+            save.setSeen(!seen)
         }
     }
 
     private var deleteButton: some View {
         Button("Delete", systemImage: "trash", role: .destructive) {
-            SaveStore.delete(save, in: modelContext)
+            SaveStore.delete(save, in: modelContext, tombstone: Account.shared.isSignedIn)
         }
     }
 }

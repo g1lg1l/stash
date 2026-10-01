@@ -75,15 +75,14 @@ struct SaveDetailView: View {
         }
         .confirmationDialog("Delete this save?", isPresented: $confirmingDelete, titleVisibility: .visible) {
             Button("Delete", role: .destructive) {
-                SaveStore.delete(save, in: modelContext)
+                SaveStore.delete(save, in: modelContext, tombstone: Account.shared.isSignedIn)
                 dismiss()
             }
         } message: {
             Text("It will be removed from your stash for good.")
         }
         .onAppear {
-            // Seen = opened. Unseen saves are what rediscovery resurfaces.
-            if save.openedAt == nil { save.openedAt = .now }
+            save.setSeen(true)
         }
     }
 

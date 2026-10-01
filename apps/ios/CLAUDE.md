@@ -1,6 +1,6 @@
 # Stash for iPhone
 
-Native iPhone "save for later" inbox. Swift 6, SwiftUI, SwiftData, iOS 26+. No third-party dependencies, no account, no backend yet (planned in the GitHub issues). Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/ios`.
+Native iPhone "save for later" inbox. Swift 6, SwiftUI, SwiftData, iOS 26+. No third-party dependencies. An optional account syncs through Supabase (`supabase/`), over plain URLSession. Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/ios`.
 
 ## Build, test, install
 
@@ -23,7 +23,7 @@ Shared/                  Compiled into the app and both extensions
   Models/                Save (SwiftData) and presentation (names, symbols, tints)
   Persistence/           ModelContainer in the App Group, SaveStore (dedupe, delete), ShareInbox (hand-off)
   Services/              URLSourceDetector, ClassificationService, Rediscovery
-Stash/                   App: features (Home, Explore, Search, SaveDetail, Settings), design system, metadata
+Stash/                   App: features (Home, Explore, Search, SaveDetail, Settings, Account), design system, metadata, sync
 ShareUI/                 Share sheet UI and link extraction, compiled into both extensions
 StashShareExtension/     Share extension (app row): Info.plist and entitlements
 StashActionExtension/    "Save to Stash" action (actions list): Info.plist, entitlements, template icon
@@ -39,6 +39,7 @@ Each top-level folder is an Xcode synchronized folder tied to its targets: new f
 - **Share hand-off.** The share extensions never open the database. They write one small JSON file per share into the App Group (`share-inbox/`). The app drains it on launch, on returning to the foreground, and on pull to refresh, deduping as it goes (`ShareInbox` in `SaveStore.swift`).
 - **Enrichment.** `MetadataEnricher` fetches oEmbed (YouTube, TikTok, X) or Open Graph in the background. It fills gaps only, never overwrites, and a failure never loses a save.
 - **Widget.** `StashWidget` reads the store (the app is the only writer) and shows `Rediscovery`'s pick, else the newest unseen save. The app reloads its timeline when it goes to the background. Tapping opens `stash://save/<id>`, which `RootView` presents as a sheet; widget URLs reach the app without a registered URL scheme.
+- **Sync.** `Account` in `Sync.swift`: email and password against Supabase's REST API, session in the Keychain, cursors (`lastPushedAt`, `pullCursor`) and the last error in UserDefaults. `sync()` pushes saves with `modifiedAt > lastPushedAt` and the `Tombstone`s, then pulls by `updated_at`; it runs with `refreshFromInbox` (launch, foreground, pull to refresh, so after every share), on going to the background, on Sync Now and after signing in. Every local change calls `Save.touch()`; applying pulled rows doesn't. The pull rules are `Sync.action` (pure) and `Sync.apply`, as in `REQUIREMENTS.md`.
 - **Classification.** `ClassificationService` is local keyword scoring, with structural rules first (Maps → Places, Spotify → Music). A category picked by hand (`categoryIsManual`) always wins.
 
 ## Conventions
@@ -46,7 +47,7 @@ Each top-level folder is an Xcode synchronized folder tied to its targets: new f
 - Enums are stored as raw strings (`categoryRaw`, `sourceRaw`…) so they work in `#Predicate`.
 - No `@Attribute(.unique)`: the schema stays CloudKit-compatible, and duplicates are resolved by `canonicalURL` in `SaveStore.add`.
 - Preferences are `@AppStorage` keys: `theme`, `feedLayout`, `showRediscovery`. Launch arguments override them (`-theme dark`), which helps for screenshots.
-- `-sampleData` (DEBUG) uses an in-memory store with sample saves and never drains the inbox.
+- `-sampleData` (DEBUG) uses an in-memory store with sample saves: it never drains the inbox, never syncs and skips the welcome screen.
 - Tests use Swift Testing, with one focused check per behavior.
 
 ## Gotchas
@@ -57,6 +58,10 @@ Each top-level folder is an Xcode synchronized folder tied to its targets: new f
 - Extensions don't pick up the app's accent color: use `Color(.accent)` explicitly (asset symbols are generated).
 - `xcodebuild test` can skip reinstalling the app when only an extension changed, so the simulator keeps running the old widget or share extension. `xcrun simctl install` the built `Stash.app` before checking extension changes.
 - The test iPhone is an iPhone 14: no Apple Intelligence.
+- New stored properties need a default (`modifiedAt = 1970`) and new models go in `ModelContainer.stash()`, which the app and the widget share, or SwiftData's automatic migration fails on existing stores.
+- Upserts send `columns=…`: PostgREST then writes a missing key as null. Without it, a cleared field (unseen again, `deleted_at`) never reaches the server.
+- Keychain items survive deleting the app, UserDefaults don't: a reinstall comes back signed in with empty cursors, so it pulls everything.
+- To try sync against the local stack (`supabase start`), point `Account.baseURL` and the key at `http://127.0.0.1:54321`; the simulator needs no ATS exception for it.
 
 ## Screenshots
 

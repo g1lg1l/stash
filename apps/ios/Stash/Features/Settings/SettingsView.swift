@@ -18,10 +18,15 @@ struct SettingsView: View {
     @AppStorage("theme") private var theme: Theme = .automatic
     @AppStorage("showRediscovery") private var showRediscovery = true
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.modelContext) private var modelContext
+    @State private var confirmingDelete = false
+    private let account = Account.shared
 
     var body: some View {
         NavigationStack {
             Form {
+                accountSection
+
                 Section("Appearance") {
                     Picker("Theme", selection: $theme) {
                         ForEach(Theme.allCases, id: \.self) { Text($0.rawValue.capitalized) }
@@ -45,7 +50,7 @@ struct SettingsView: View {
                 } header: {
                     Text("Your Data")
                 } footer: {
-                    Text("No account. Your \(saves.count == 1 ? "save stays" : "\(saves.count) saves stay") on this iPhone. Export sends every title and link as plain text, to Notes, Files or anywhere else.")
+                    Text("\(account.isSignedIn ? "" : "No account. ")Your \(saves.count == 1 ? "save stays" : "\(saves.count) saves stay") on this iPhone\(account.isSignedIn ? ", synced with your account" : ""). Export sends every title and link as plain text, to Notes, Files or anywhere else.")
                 }
 
                 Section("About") {
@@ -71,6 +76,47 @@ struct SettingsView: View {
         }
         // A sheet is its own presentation: keep it in step with the app while the theme changes.
         .preferredColorScheme(theme.colorScheme)
+    }
+
+    private var accountSection: some View {
+        Section {
+            if let session = account.session {
+                Text(session.email)
+                LabeledContent("Last Synced") {
+                    if account.isSyncing {
+                        Text("Syncing…")
+                    } else if let error = account.lastError {
+                        Text(error)
+                    } else if let date = account.lastSyncedAt {
+                        Text(date, format: .relative(presentation: .named))
+                    } else {
+                        Text("Never")
+                    }
+                }
+                Button("Sync Now", systemImage: "arrow.triangle.2.circlepath") {
+                    Task { await account.sync(modelContext) }
+                }
+                .disabled(account.isSyncing)
+                Button("Sign Out", systemImage: "rectangle.portrait.and.arrow.right") { account.signOut() }
+                Button("Delete Account", systemImage: "person.crop.circle.badge.xmark", role: .destructive) { confirmingDelete = true }
+            } else {
+                NavigationLink { AuthView(creating: false) } label: { Label("Sign In", systemImage: "person.crop.circle") }
+                NavigationLink { AuthView(creating: true) } label: { Label("Create Account", systemImage: "person.crop.circle.badge.plus") }
+            }
+        } header: {
+            Text("Account")
+        } footer: {
+            if !account.isSignedIn {
+                Text(account.lastError ?? "Sync your saves across your devices. Optional: Stash works the same without an account.")
+            }
+        }
+        .confirmationDialog("Delete your account?", isPresented: $confirmingDelete, titleVisibility: .visible) {
+            Button("Delete Account", role: .destructive) {
+                Task { await account.deleteAccount() }
+            }
+        } message: {
+            Text("This deletes your account and the copy of your saves on the server. Your saves stay on this iPhone.")
+        }
     }
 
     private var exportText: String {

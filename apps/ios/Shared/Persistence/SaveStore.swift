@@ -13,6 +13,7 @@ enum SaveStore {
             // Order-independent: the earliest share is when it was first stashed.
             save.createdAt = min(save.createdAt, date)
             save.lastSavedAt = max(save.lastSavedAt, date)
+            save.touch()
             try context.save()
             return save
         }
@@ -32,11 +33,12 @@ enum SaveStore {
 }
 
 extension SaveStore {
-    /// Removes the save entirely, including its cached thumbnail.
-    static func delete(_ save: Save, in context: ModelContext) {
+    /// Removes the save entirely, including its cached thumbnail. Signed in, it leaves a tombstone for sync to push.
+    static func delete(_ save: Save, in context: ModelContext, tombstone: Bool) {
         if let thumbnail = save.thumbnailURL {
             URLCache.shared.removeCachedResponse(for: URLRequest(url: thumbnail))
         }
+        if tombstone { context.insert(Tombstone(id: save.id)) }
         context.delete(save)
         try? context.save()
     }

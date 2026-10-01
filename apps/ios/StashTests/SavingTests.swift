@@ -143,7 +143,7 @@ struct SaveStoreTests {
         URLCache.shared.storeCachedResponse(CachedURLResponse(response: response, data: Data([1, 2, 3])), for: request)
         #expect(URLCache.shared.cachedResponse(for: request) != nil)
 
-        SaveStore.delete(save, in: context)
+        SaveStore.delete(save, in: context, tombstone: false)
 
         #expect(try context.fetchCount(FetchDescriptor<Save>()) == 0)
         // URLCache removes from disk in the background: an entry already written stays readable for a moment.
