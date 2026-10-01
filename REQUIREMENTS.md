@@ -105,15 +105,42 @@ Port `URLSourceDetector` rule for rule:
 - `--ez sampleData true` (debug builds) opens an in-memory store with the same 15 sample saves as iOS and never touches the real one.
 - `versionCode` goes up for each build installed on a phone.
 
-## Sync (planned, Supabase)
-Not built yet; this is the design both apps follow when they add it.
-- The device's own database stays the source of truth. The app works fully offline and without an account; signing in only turns on sync.
-- `supabase/migrations` defines the `saves` table: the same fields in snake_case, plus `user_id`, `updated_at` (set by the server on every write) and `deleted_at`. Row level security limits each user to their own rows.
-- Push: rows changed locally since the last sync are upserted by `id`. Pull: rows with `updated_at` after the last one seen. The last write to reach the server wins.
-- Delete becomes a tombstone (`deleted_at`), kept locally until it has been pushed, so other devices remove the save too.
-- Dedupe still runs on each device: two devices saving the same link offline end up with two rows, and the next `add` or pull merges them by `canonicalUrl`.
-- The web client has no local database: it reads and writes Supabase directly.
-- Only the publishable key ships in the apps. The service role key never goes in the repo.
+## Account and sync (Supabase)
+The device's own database stays the source of truth. The app works fully offline and without an account; signing in only turns on sync, and it can happen at any time.
+
+### Signing in
+- First launch shows a welcome screen once: what Stash does, **Sign in**, **Create account** and **Not now**. Not now goes straight to Home. It is never shown again (`seenWelcome`), whatever the choice.
+- Settings → Account, signed out: "Sync your saves" with Sign in / Create account. Signed in: the email, "Last synced" (relative time, or "Syncing…", or the last error), **Sync now**, **Sign out**, **Delete account** (confirmation dialog: deletes the account and the copy on the server, keeps the saves on this device).
+- One auth screen with email and password, switching between Sign in and Create account. The password needs 6+ characters. The server's message is shown on failure (`msg`, else `error_description`). If Create account returns no session (email confirmation is on), say "Check your email to confirm, then sign in."
+- Sign out keeps every save on the device, forgets the session and resets both sync cursors, so the next sign-in, to any account, uploads everything again.
+- Email and password only for now. Sign in with Apple / Google need the paid Apple program and a Google Cloud client (#17).
+
+### Server
+`supabase/migrations` is the schema. Base URL `https://kzgmhvqbvrylwydqskcm.supabase.co`, publishable key `sb_publishable_dCk3njz-F4vws7Y5ky6XNA__pOe081Z` (public by design: row level security protects the data). Every request sends `apikey: <key>`; signed-in requests also send `Authorization: Bearer <access_token>`. Plain HTTPS from the platform's own client (URLSession, OkHttp), no Supabase SDK.
+
+- Sign up: `POST /auth/v1/signup` `{"email","password"}`. Sign in: `POST /auth/v1/token?grant_type=password`, same body. Both answer `access_token`, `refresh_token`, `expires_at` (Unix seconds) and `user.id`/`user.email`. Errors are 4xx with `msg`.
+- Refresh: `POST /auth/v1/token?grant_type=refresh_token` `{"refresh_token"}`, before `expires_at` or after a 401, once. If refresh fails with 4xx the session is gone: sign out locally and show "Signed out. Sign in again to keep syncing."
+- Sign out: `POST /auth/v1/logout`, best effort.
+- Delete account: `POST /rest/v1/rpc/delete_account` (empty JSON body `{}`), then sign out locally.
+- Store the session in the Keychain (iOS) / app-private preferences (Android).
+
+The `saves` table has the `Save` fields in snake_case (`canonical_url`, `content_type`, `category_is_manual`, `description_text`, `thumbnail_url`, `created_at`, `last_saved_at`, `opened_at`), plus `user_id` (set by the server, never sent), `updated_at` (set by the server on every write, never sent) and `deleted_at`. Ids are UUIDs, lowercase. Dates are ISO 8601 in UTC with milliseconds when sent; the server answers microseconds and `+00:00`.
+
+### Sync
+Local additions: `modifiedAt` on every save (set to now on every local change: add, re-save, edit, seen, category, enrichment result), and a `Tombstone` record (`id`, `deletedAt`) written when a save is deleted while signed in (signed out, delete stays a plain delete). Stored next to the session: `lastPushedAt` (local time) and `pullCursor` (the server's last `updated_at`, kept as the exact string it sent).
+
+`sync()` runs on launch / return to the foreground (with enrichment), after a share is saved, on pull to refresh, on Sync now, right after signing in, and when the app goes to the background. One at a time; a call while one runs is dropped. Offline or failing, it just stops and tries again next time: it never changes or loses local data on failure.
+
+1. **Push.** `pushStart = now` (taken first). Upsert every save with `modifiedAt > lastPushedAt`: `POST /rest/v1/saves` with `Prefer: resolution=merge-duplicates,return=minimal` and a JSON array (500 rows per request). Then tombstones: `PATCH /rest/v1/saves?id=in.(<ids>)` with `{"deleted_at": "<deletedAt>"}` (ids of rows the server never had are simply ignored). When all succeed: `lastPushedAt = pushStart`, delete the pushed tombstones.
+2. **Pull.** `GET /rest/v1/saves?select=*&updated_at=gt.<pullCursor>&order=updated_at.asc,id.asc&limit=500` (no `updated_at` filter on the first pull), repeated while a page is full. **URL-encode the cursor**: its `+00:00` must go out as `%2B00:00`, or the server rejects it. Apply each page in one transaction, then save the last row's `updated_at` as `pullCursor`. For each row:
+   - A local save with the same id and `modifiedAt > pushStart` (changed during this sync): skip it, the next push wins.
+   - `deleted_at` set: delete the local save with that id, if any. No tombstone.
+   - A local save with the same id: replace its fields with the server's. `modifiedAt` stays as it was, so it isn't pushed back.
+   - A local save with a different id but the same `canonicalUrl` (the same link saved on two devices): keep the id that sorts first as a lowercase string, so every device picks the same survivor. Merge as `add` does (earliest `createdAt`, latest `lastSavedAt`, `openedAt` if either has one, a manual category wins, the server's metadata with local values filling its gaps) into the survivor, tombstone the other id, and set the survivor's `modifiedAt` to now so it goes back up. (Keeping "the server's id" instead loses the save: two devices pulling each other's copy would each tombstone their own.)
+   - Otherwise insert it with `modifiedAt = 0`.
+3. Unknown enum strings fall back as everywhere else. Widget and screens refresh as after any other write.
+
+Last write to reach the server wins. Each platform keeps the pull rules (step 2) in a pure function with JVM / Swift Testing checks: skip changed-during-sync, delete, update without re-push, merge by `canonicalUrl`, insert.
 
 ## Platform mapping
 
