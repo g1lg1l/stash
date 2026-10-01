@@ -13,7 +13,7 @@ android {
         applicationId = "com.g1lg1l.stash"
         minSdk = 31 // Android 12: Material You, themed icons, the new widget APIs.
         targetSdk = 37
-        versionCode = 1 // Bump for each build installed on a phone, so Settings → Version tells them apart.
+        versionCode = 2 // Bump for each build installed on a phone, so Settings → Version tells them apart.
         versionName = "1.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
