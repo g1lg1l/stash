@@ -13,7 +13,7 @@ REQUIREMENTS.md  Features and behavior both apps implement, including how sync w
 
 Add workspace tooling (pnpm workspaces, `packages/`) only once two JS projects share code.
 
-Email confirmation is on, locally too: confirmation emails land in Mailpit (http://127.0.0.1:54324) and their links go to the web client's dev server (`site_url` in `config.toml`). The hosted project's Site URL is set in the dashboard (*Authentication → URL Configuration*), not by `config.toml`: never `supabase config push`, it would send the local URLs.
+Email confirmation is on, locally too: confirmation emails land in Mailpit (http://127.0.0.1:54324). `config.toml` holds the hosted project's auth settings (`supabase config push` sends them): `site_url` is the web client on GitHub Pages, where links from the apps' sign-ups land; the web asks for its own URL with `redirect_to`, allowed for the dev server through `additional_redirect_urls`.
 
 Supabase runs locally in Docker, no account needed: `supabase db start` (just Postgres), `supabase test db`, `supabase stop`; `supabase start` brings up the whole stack with Studio. The CLI is from `brew install supabase/tap/supabase`. A new schema change is `supabase migration new <name>`, never an edit to an existing migration. The hosted project is connected to the repo through Supabase's GitHub integration, so pushing to `main` deploys new migrations.
 

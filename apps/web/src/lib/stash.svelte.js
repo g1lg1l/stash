@@ -135,7 +135,9 @@ async function authorized(method, path, options = {}) {
 
 /** Returns a note instead when the server wants the email confirmed first. */
 export async function signIn(email, password, create) {
-  const json = await request('POST', create ? 'auth/v1/signup' : 'auth/v1/token?grant_type=password', { body: { email, password } })
+  // The confirmation link comes back to this page wherever it runs (GitHub Pages, or the dev server).
+  const back = encodeURIComponent(location.origin + import.meta.env.BASE_URL)
+  const json = await request('POST', create ? `auth/v1/signup?redirect_to=${back}` : 'auth/v1/token?grant_type=password', { body: { email, password } })
   const session = toSession(json, email)
   if (!session) return 'Check your email to confirm, then sign in.'
   setSession(session)
