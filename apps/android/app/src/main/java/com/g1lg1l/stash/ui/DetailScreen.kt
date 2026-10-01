@@ -112,7 +112,8 @@ fun DetailScreen(save: Save?) {
     LaunchedEffect(save.id) { if (save.openedAt == null) Stash.edit(save) { it.seen() } }
     LightStatusBarIcons(overMedia)
 
-    Box(Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)) {
+    // A Surface, not a background: outside the tabs' Scaffold nothing else sets onSurface, and text would default to black.
+    Surface(Modifier.fillMaxSize()) { Box {
         Column(Modifier.verticalScroll(scroll)) {
             if (save.showsMedia) {
                 Box(Modifier.onSizeChanged { mediaHeight = it.height }) {
@@ -178,7 +179,7 @@ fun DetailScreen(save: Save?) {
             },
             colors = TopAppBarDefaults.topAppBarColors(containerColor = barColor),
         )
-    }
+    } }
 
     if (confirmingDelete) {
         AlertDialog(
