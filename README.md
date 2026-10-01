@@ -13,13 +13,13 @@
 
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
 
-No account, works offline, and your saves stay on your phone.
+No account, works offline, and your saves stay on your phone. Sign in only if you want them on your other devices and the web.
 
 ## Get it
 
 - **[iPhone](apps/ios)**: Swift and SwiftUI, iOS 26+.
 - **[Android](apps/android)**: Kotlin and Jetpack Compose, Android 12+.
-- **Web**: coming.
+- **[Web](apps/web)**: at [g1lg1l.github.io/stash](https://g1lg1l.github.io/stash/), with the same account as the apps.
 
 Both apps do the same things; [REQUIREMENTS.md](REQUIREMENTS.md) is the list. Each app's page explains how to install it.
 

@@ -142,6 +142,13 @@ Local additions: `modifiedAt` on every save (set to now on every local change: a
 
 Last write to reach the server wins. Each platform keeps the pull rules (step 2) in a pure function with JVM / Swift Testing checks: skip changed-during-sync, delete, update without re-push, merge by `canonicalUrl`, insert.
 
+### Web client (`apps/web`)
+- Needs an account: no local database, it reads and writes `saves` directly through the same REST API, and keeps only the session (in `localStorage`).
+- Loads every save without `deleted_at` on sign-in and when the tab comes back; changes go up at once (`PATCH` of the changed fields), and the screen rolls back if the server refuses.
+- Adding: a link pasted in the bar or anywhere on the page (⌘V), found inside text as on the phones. The same `canonical_url` as the apps; already there, it bumps `lastSavedAt`. New saves go up `pending` with category `other`: the browser can't fetch other sites, so a phone enriches and classifies them after its next pull.
+- Delete sets `deleted_at`, with Undo clearing it. Opening a save marks it seen.
+- Same screens as the apps: Home by day, Explore (Worth another look, categories), Search, the detail panel, Settings (account, theme).
+
 ## Platform mapping
 
 | iOS | Android |
