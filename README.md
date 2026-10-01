@@ -6,8 +6,10 @@
 
 <p align="center"><b>Share it now. Find it later.</b></p>
 
+<p align="center"><a href="https://g1lg1l.github.io/stash/"><b>Open Stash on the web</b></a></p>
+
 <p align="center">
-  <img src="docs/hero.png" alt="Stash on Android, on the web in Chrome on a Mac, and on iPhone">
+  <a href="https://g1lg1l.github.io/stash/"><img src="docs/hero.png" alt="Stash on Android, on the web in Chrome on a Mac, and on iPhone"></a>
 </p>
 
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
