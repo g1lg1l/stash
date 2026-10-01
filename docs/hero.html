@@ -1,0 +1,190 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<!-- README image (docs/hero.png). Render at 2400×1350, device scale 1, in Chrome: see "README image" in CLAUDE.md. -->
+<style>
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 2400px; height: 1350px; overflow: hidden; }
+  body {
+    position: relative;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    background:
+      radial-gradient(1200px 700px at 50% 38%, rgb(255 255 255 / 0.22), transparent 70%),
+      linear-gradient(165deg, #ff7f57 0%, #ff5a36 48%, #f0401c 100%);
+  }
+
+  /* The icon's stack of cards, peeking out behind the laptop. */
+  .card { position: absolute; left: 50%; translate: -50% 0; border-radius: 64px; }
+  .card.back { top: 34px; width: 1240px; height: 300px; background: rgb(255 255 255 / 0.16); }
+  .card.mid { top: 70px; width: 1420px; height: 300px; background: rgb(255 255 255 / 0.26); }
+
+  /* MacBook */
+  .mac { position: absolute; left: 432px; top: 108px; }
+  .lid {
+    position: relative;
+    padding: 18px 18px 28px;
+    border-radius: 34px 34px 10px 10px;
+    background: #0c0c0e;
+    box-shadow:
+      0 0 0 3px #c7c9ce,
+      0 0 0 5px #a9abb1,
+      0 60px 120px -30px rgb(90 15 0 / 0.55);
+  }
+  .display {
+    position: relative;
+    width: 1500px;
+    height: 938px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: #f4f4f6;
+  }
+  .notch {
+    position: absolute; top: 0; left: 50%; translate: -50% 0; z-index: 5;
+    width: 190px; height: 26px; border-radius: 0 0 14px 14px; background: #0c0c0e;
+  }
+  .menubar {
+    display: flex; align-items: center; gap: 22px;
+    height: 26px; padding: 0 18px;
+    background: rgb(246 246 248 / 0.92);
+    font-size: 13.5px; font-weight: 500; color: #1d1d1f;
+  }
+  .menubar .apple { font-size: 15px; }
+  .menubar b { font-weight: 700; }
+  .menubar .right { margin-left: auto; display: flex; gap: 16px; align-items: center; }
+
+  .chrome { height: calc(100% - 26px); display: flex; flex-direction: column; background: #fff; }
+  .tabs {
+    position: relative; display: flex; align-items: flex-end; gap: 6px;
+    height: 44px; padding: 0 12px 0 92px; background: #e3e5ea;
+  }
+  .lights { position: absolute; left: 18px; top: 16px; display: flex; gap: 8px; }
+  .lights i { width: 12px; height: 12px; border-radius: 50%; }
+  .lights i:nth-child(1) { background: #ff5f57; }
+  .lights i:nth-child(2) { background: #febc2e; }
+  .lights i:nth-child(3) { background: #28c840; }
+  .tab {
+    display: flex; align-items: center; gap: 9px;
+    width: 250px; height: 36px; padding: 0 14px;
+    border-radius: 11px 11px 0 0; background: #fff;
+    font-size: 13px; color: #1f1f1f;
+  }
+  .tab img { width: 16px; height: 16px; border-radius: 4px; }
+  .tab .x { margin-left: auto; color: #5f6368; font-size: 13px; }
+  .newtab { margin-bottom: 9px; color: #5f6368; font-size: 20px; line-height: 1; }
+  .toolbar { display: flex; align-items: center; gap: 16px; height: 44px; padding: 0 14px; border-bottom: 1px solid #e6e7ea; }
+  .toolbar svg { width: 18px; height: 18px; fill: none; stroke: #5f6368; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .omnibox {
+    flex: 1; display: flex; align-items: center; gap: 10px;
+    height: 32px; padding: 0 14px; border-radius: 16px; background: #f1f3f4;
+    font-size: 14px; color: #1f1f1f;
+  }
+  .omnibox .dim { color: #5f6368; }
+  .avatar { width: 24px; height: 24px; border-radius: 50%; background: linear-gradient(135deg, #ffb199, #ff5a36); }
+  .page { flex: 1; overflow: hidden; }
+  .page img { width: 100%; display: block; }
+
+  .deck {
+    position: absolute; left: 50%; top: calc(100% + 5px); translate: -50% 0;
+    width: 1860px; height: 34px;
+    border-radius: 4px 4px 26px 26px / 4px 4px 20px 20px;
+    background: linear-gradient(#e2e3e7 0%, #c9cbd0 45%, #9fa1a7 100%);
+    box-shadow: 0 30px 60px -20px rgb(90 15 0 / 0.5);
+  }
+  .deck::before {
+    content: ''; position: absolute; left: 50%; top: 0; translate: -50% 0;
+    width: 270px; height: 11px; border-radius: 0 0 14px 14px;
+    background: linear-gradient(#a6a8ae, #c3c5ca);
+  }
+
+  /* Phones */
+  .phone { position: absolute; }
+  .phone .screen { position: relative; overflow: hidden; }
+  .phone .screen img { display: block; width: 100%; }
+
+  .iphone { left: 1884px; top: 586px; }
+  .iphone .body {
+    padding: 12px; border-radius: 66px; background: #050506;
+    box-shadow:
+      0 0 0 4px #8e9097,
+      0 0 0 6px #b9bbc1,
+      0 70px 110px -30px rgb(80 10 0 / 0.65);
+  }
+  .iphone .screen { width: 318px; border-radius: 54px; }
+  .iphone .island {
+    position: absolute; top: 11px; left: 50%; translate: -50% 0;
+    width: 104px; height: 31px; border-radius: 20px; background: #000;
+  }
+  .iphone .button { position: absolute; width: 5px; border-radius: 3px; background: #8e9097; }
+
+  .pixel { left: 176px; top: 572px; }
+  .pixel .body {
+    padding: 11px; border-radius: 50px; background: #0a0a0b;
+    box-shadow:
+      0 0 0 4px #2c2d31,
+      0 0 0 6px #5a5c62,
+      0 70px 110px -30px rgb(80 10 0 / 0.65);
+  }
+  .pixel .screen { width: 318px; border-radius: 40px; }
+  .pixel .hole {
+    position: absolute; top: 14px; left: 50%; translate: -50% 0;
+    width: 19px; height: 19px; border-radius: 50%; background: #000;
+    box-shadow: inset 0 0 0 3px #16171a;
+  }
+  .pixel .button { position: absolute; width: 5px; border-radius: 3px; background: #3a3b40; }
+</style>
+</head>
+<body>
+  <div class="card back"></div>
+  <div class="card mid"></div>
+
+  <div class="mac">
+    <div class="lid">
+      <div class="display">
+        <div class="notch"></div>
+        <div class="menubar">
+          <b>Chrome</b><span>File</span><span>Edit</span><span>View</span><span>History</span><span>Bookmarks</span><span>Profiles</span><span>Tab</span><span>Window</span><span>Help</span>
+          <span class="right"><span>Thu 1 Oct</span><span>9:41</span></span>
+        </div>
+        <div class="chrome">
+          <div class="tabs">
+            <span class="lights"><i></i><i></i><i></i></span>
+            <span class="tab"><img src="../apps/web/public/icon.png" alt="">Stash<span class="x">✕</span></span>
+            <span class="newtab">+</span>
+          </div>
+          <div class="toolbar">
+            <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg>
+            <svg viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 0-2.3 5.7M20 4v7h-7"/></svg>
+            <div class="omnibox">
+              <svg viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>
+              <span>g1lg1l.github.io<span class="dim">/stash/</span></span>
+            </div>
+            <span class="avatar"></span>
+          </div>
+          <div class="page"><img src="../apps/web/docs/screenshots/wide.png" alt=""></div>
+        </div>
+      </div>
+    </div>
+    <div class="deck"></div>
+  </div>
+
+  <div class="phone pixel">
+    <span class="button" style="right:-10px; top:150px; height:56px"></span>
+    <span class="button" style="right:-10px; top:236px; height:100px"></span>
+    <div class="body">
+      <div class="screen"><img src="../apps/android/docs/screenshots/explore.png" alt=""><span class="hole"></span></div>
+    </div>
+  </div>
+
+  <div class="phone iphone">
+    <span class="button" style="left:-11px; top:150px; height:34px"></span>
+    <span class="button" style="left:-11px; top:212px; height:62px"></span>
+    <span class="button" style="left:-11px; top:290px; height:62px"></span>
+    <span class="button" style="right:-11px; top:230px; height:96px"></span>
+    <div class="body">
+      <div class="screen"><img src="../apps/ios/docs/screenshots/home.png" alt=""><span class="island"></span></div>
+    </div>
+  </div>
+</body>
+</html>

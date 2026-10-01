@@ -7,8 +7,7 @@
 <p align="center"><b>Share it now. Find it later.</b></p>
 
 <p align="center">
-  <img src="apps/ios/docs/screenshots/home.png" width="200" alt="Home on iPhone">
-  <img src="apps/android/docs/screenshots/home.png" width="200" alt="Home on Android">
+  <img src="docs/hero.png" alt="Stash on Android, on the web in Chrome on a Mac, and on iPhone">
 </p>
 
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
@@ -21,7 +20,7 @@ No account, works offline, and your saves stay on your phone. Sign in only if yo
 - **[Android](apps/android)**: Kotlin and Jetpack Compose, Android 12+.
 - **[Web](apps/web)**: at [g1lg1l.github.io/stash](https://g1lg1l.github.io/stash/), with the same account as the apps.
 
-Both apps do the same things; [REQUIREMENTS.md](REQUIREMENTS.md) is the list. Each app's page explains how to install it.
+All three do the same things; [REQUIREMENTS.md](REQUIREMENTS.md) is the list. Each one's page has screenshots and explains how to install it.
 
 ## License
 

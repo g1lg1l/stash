@@ -36,3 +36,7 @@ public/icon.png       The iOS icon export
 - Props are live getters. Once a parent clears what it passes (`selected`), the prop reads as null, even inside a handler that's still running: grab the value before closing anything.
 - `{#key x.id}` inside `{#if x}` crashes when `x` becomes null; key on something that's never null.
 - Against the local stack (`supabase start`), put `VITE_SUPABASE_URL=http://127.0.0.1:54321` and the local `VITE_SUPABASE_KEY` in `.env.local` (git-ignored).
+
+## Screenshots
+
+Sample saves in the local stack (sign up a demo user, insert the apps' `SampleData` rows through REST with `last_saved_at` counted back from 9:41 today), `npm run dev`, then headless Chrome with `Date` pinned to 9:41 today so the greeting and the relative times match the apps' shots. `docs/screenshots/`: `home`, `explore`, `home-dark`, `welcome` at 1440×900 resized to 1200 wide; `wide.png` is 1440×800 at 2x, Home with the cacio e pepe open, for the README image.

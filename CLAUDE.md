@@ -24,3 +24,7 @@ Run each platform's commands from its own folder (`cd apps/android && ./gradlew 
 - Once the build and tests pass, commit and push straight to `main` and close the issue with a short comment. No PRs. Never force push unless asked.
 - Commit as `g1lg1l <gilbert.ndresaj@gmail.com>`. It's set in this repo's local git config; the global identity on this Mac belongs to someone else.
 - Comments explain why, sparingly. `ponytail:` comments mark deliberate shortcuts and when to upgrade them.
+
+## README image
+
+`docs/hero.png` is `docs/hero.html` rendered by Chrome at 2400×1350, device scale 1 (headless Chrome through `puppeteer-core`, installed outside the repo). It frames `apps/web/docs/screenshots/wide.png`, `apps/android/docs/screenshots/explore.png` and `apps/ios/docs/screenshots/home.png`: retake those first, all at 9:41 with the sample saves, then render again.
