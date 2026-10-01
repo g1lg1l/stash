@@ -1,0 +1,14 @@
+<resources>
+    <!-- Only the window and splash screen; Compose draws everything else in Material You colors. -->
+    <style name="Theme.Stash" parent="@android:style/Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+    </style>
+
+    <!-- The share sheet floats over the app it was shared from. -->
+    <style name="Theme.Stash.Share">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item>
+    </style>
+</resources>

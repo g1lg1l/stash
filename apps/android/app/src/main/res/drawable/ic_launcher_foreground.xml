@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The iOS icon's three stacked cards and ribbon (Stash/AppIcon.icon on the ios branch), in the 1024 grid it was drawn in.
+     Each card draws only the part the card in front leaves visible, and the ribbon is a notch in the front card,
+     so the same drawable works as the colored foreground and as the monochrome layer for themed icons. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="1536"
+    android:viewportHeight="1536">
+    <group android:translateX="256" android:translateY="256">
+        <group android:pivotX="512" android:pivotY="512" android:scaleX="1.12" android:scaleY="1.12">
+            <path
+                android:fillAlpha="0.5"
+                android:fillColor="#FFFFFF"
+                android:fillType="evenOdd"
+                android:pathData="M388,272 H636 A56,56 0 0 1 692,328 V410 H332 V328 A56,56 0 0 1 388,272 Z M332,348.03 A68,68 0 0 1 360,342 H664 A68,68 0 0 1 692,348.03 V410 H332 Z" />
+            <path
+                android:fillAlpha="0.75"
+                android:fillColor="#FFFFFF"
+                android:fillType="evenOdd"
+                android:pathData="M360,342 H664 A68,68 0 0 1 732,410 V502 H292 V410 A68,68 0 0 1 360,342 Z M292,432.72 A80,80 0 0 1 332,422 H692 A80,80 0 0 1 732,432.72 V502 H292 Z" />
+            <path
+                android:fillColor="#FFFFFF"
+                android:fillType="evenOdd"
+                android:pathData="M332,422 H692 A80,80 0 0 1 772,502 V672 A80,80 0 0 1 692,752 H332 A80,80 0 0 1 252,672 V502 A80,80 0 0 1 332,422 Z M612,422 H692 V578 L652,546 L612,578 Z" />
+        </group>
+    </group>
+</vector>

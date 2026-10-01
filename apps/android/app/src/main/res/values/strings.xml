@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">Stash</string>
+    <string name="save_to_stash">Save to Stash</string>
+    <string name="widget_name">Worth another look</string>
+    <string name="widget_description">Brings back something you saved.</string>
+</resources>
