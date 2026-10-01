@@ -1,6 +1,6 @@
-# Stash for Android: port requirements
+# Stash requirements
 
-Stash ships on both platforms as the same app with the same features. The iPhone app lives on the `ios` branch (Swift 6, SwiftUI, SwiftData, iOS 26+). This branch, `android`, holds the native Android app and nothing else. The branches share no code, so this document is the contract between them: when a behavior changes on one side, change it here and on the other side.
+Stash ships on both platforms as the same app with the same features. The iPhone app is in `apps/ios` (Swift 6, SwiftUI, SwiftData, iOS 26+), the Android app in `apps/android`. They share no code, so this document is the contract between them: when a behavior changes on one side, change it here and on the other side.
 
 ## Platform
 

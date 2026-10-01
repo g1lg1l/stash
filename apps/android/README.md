@@ -17,7 +17,7 @@ That recipe on Instagram, the trail on YouTube, the café a friend sent you on M
 
 No account, works offline, and your saves stay on your phone. Colors follow your wallpaper.
 
-The iPhone app lives on the [`ios` branch](../../tree/ios). Both do the same things; [REQUIREMENTS.md](REQUIREMENTS.md) is the list.
+There's also an [iPhone app](../ios). Both do the same things; [REQUIREMENTS.md](../../REQUIREMENTS.md) is the list.
 
 ## What it does
 
@@ -60,4 +60,4 @@ The same steps are in the app, under *Settings → Get the most out of Stash*.
 
 ## License
 
-[GPL-3.0](LICENSE)
+[GPL-3.0](../../LICENSE)

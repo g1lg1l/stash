@@ -1,6 +1,6 @@
 # Stash for Android
 
-Native Android "save for later" inbox. Kotlin, Jetpack Compose, Material 3 with dynamic color, Room, Android 12+ (minSdk 31, target 37). No account, no backend yet (planned in the GitHub issues). The iPhone app lives on the `ios` branch; the two share no code. `REQUIREMENTS.md` is the contract between them: when behavior changes on one side, update it there. `README.md` is for people using the app; this file is for working on it.
+Native Android "save for later" inbox. Kotlin, Jetpack Compose, Material 3 with dynamic color, Room, Android 12+ (minSdk 31, target 37). No account, no backend yet (planned in the GitHub issues). Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/android`.
 
 ## Build, test, install
 
@@ -51,7 +51,6 @@ docs/              README icon and screenshots
 - Debug builds: `adb shell am start -n com.g1lg1l.stash/.MainActivity --ez sampleData true` opens an in-memory store with the sample saves; it's never enriched and never touches the real one. `adb shell cmd uimode night yes` tries dark mode without touching the setting.
 - Icons are Material Symbols Rounded vector drawables, fetched from `google/material-design-icons` (`symbols/android/<name>/materialsymbolsrounded/<name>_24px.xml`, or `_fill1_` for filled) with the `android:tint` line removed. Drawables rather than Compose vectors, because the widget needs them too.
 - Plain strings in Compose, as on iOS. `strings.xml` only holds what XML needs (labels, widget description).
-- Comments explain why, sparingly. `ponytail:` comments mark deliberate shortcuts and when to upgrade them.
 - Tests: one focused check per behavior. Pure logic gets JVM tests; only Room needs a device.
 
 ## Gotchas
@@ -62,11 +61,7 @@ docs/              README icon and screenshots
 - The first launch of a debug build on the emulator takes a few seconds to draw; take screenshots after that. Debug builds also scroll less smoothly than release.
 - The Undo snackbar lasts 4 seconds. Scripted taps that wait on `uiautomator dump` in between will miss it.
 - The Pixel launcher on the emulator doesn't show Glance's generated widget previews, so `stash_widget_info.xml` uses `drawable-nodpi/widget_preview.png`, a crop of the real widget. Retake it when the widget's look changes.
-- The working tree keeps the iOS branch's ignored Xcode user state (`Stash.xcodeproj/`); `.gitignore` hides it. Switching branches is fine.
 
-## Workflow
+## Screenshots
 
-- Work is tracked as GitHub issues on `g1lg1l/stash`. Reference them in commit messages: `feat: add Settings (#14)`.
-- This branch is `android`. Once the build and tests pass, commit and push straight to it and close the issue with a short comment. No PRs. Never force push unless asked. Never touch `ios` from here.
-- Commit as `g1lg1l <gilbert.ndresaj@gmail.com>`. It's set in this repo's local git config; the global identity on this Mac belongs to someone else.
-- README screenshots: sample data on the emulator, status bar in demo mode (`adb shell settings put global sysui_demo_allowed 1`, then `am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941`, `… -e command notifications -e visible false`, `… -e command network -e mobile hide`), `adb exec-out screencap -p`, resized to 600 px wide into `docs/screenshots/`. `uiautomator dump` gives the bounds to tap.
+Sample data on the emulator, status bar in demo mode (`adb shell settings put global sysui_demo_allowed 1`, then `am broadcast -a com.android.systemui.demo -e command clock -e hhmm 0941`, `… -e command notifications -e visible false`, `… -e command network -e mobile hide`), `adb exec-out screencap -p`, resized to 600 px wide into `docs/screenshots/`. `uiautomator dump` gives the bounds to tap.

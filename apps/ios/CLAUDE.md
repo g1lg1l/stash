@@ -1,6 +1,6 @@
-# Stash
+# Stash for iPhone
 
-Native iPhone "save for later" inbox. Swift 6, SwiftUI, SwiftData, iOS 26+. No third-party dependencies, no account, no backend yet (planned in the GitHub issues). `README.md` is for people using the app; this file is for working on it.
+Native iPhone "save for later" inbox. Swift 6, SwiftUI, SwiftData, iOS 26+. No third-party dependencies, no account, no backend yet (planned in the GitHub issues). Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/ios`.
 
 ## Build, test, install
 
@@ -47,7 +47,6 @@ Each top-level folder is an Xcode synchronized folder tied to its targets: new f
 - No `@Attribute(.unique)`: the schema stays CloudKit-compatible, and duplicates are resolved by `canonicalURL` in `SaveStore.add`.
 - Preferences are `@AppStorage` keys: `theme`, `feedLayout`, `showRediscovery`. Launch arguments override them (`-theme dark`), which helps for screenshots.
 - `-sampleData` (DEBUG) uses an in-memory store with sample saves and never drains the inbox.
-- Comments explain why, sparingly. `ponytail:` comments mark deliberate shortcuts and when to upgrade them.
 - Tests use Swift Testing, with one focused check per behavior.
 
 ## Gotchas
@@ -59,9 +58,6 @@ Each top-level folder is an Xcode synchronized folder tied to its targets: new f
 - `xcodebuild test` can skip reinstalling the app when only an extension changed, so the simulator keeps running the old widget or share extension. `xcrun simctl install` the built `Stash.app` before checking extension changes.
 - The test iPhone is an iPhone 14: no Apple Intelligence.
 
-## Workflow
+## Screenshots
 
-- Work is tracked as GitHub issues on `g1lg1l/stash`. Reference them in commit messages: `feat: add Settings (#14)`.
-- Once the build and tests pass, commit and push straight to `main` and close the issue with a short comment. No PRs. Never force push unless asked.
-- Commit as `g1lg1l <gilbert.ndresaj@gmail.com>`. It's set in this repo's local git config; the global identity on this Mac belongs to someone else.
-- README screenshots: run the simulator with `-sampleData` and `xcrun simctl status_bar <id> override --time 9:41` (the simulator must be booted), then resize to 600 px wide into `docs/screenshots/`. Taps can't be scripted from the shell, so the share sheet and widget shots came from a temporary UI test target (not committed) driving Safari (`XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")`) and SpringBoard; it can write PNGs straight to a Mac path. Icon: `ictool Stash/AppIcon.icon --export-image --output-file docs/icon.png --platform iOS --rendition Default --width 256 --height 256 --scale 1` (`ictool` ships inside Icon Composer in Xcode).
+Run the simulator with `-sampleData` and `xcrun simctl status_bar <id> override --time 9:41` (the simulator must be booted), then resize to 600 px wide into `docs/screenshots/`. Taps can't be scripted from the shell, so the share sheet and widget shots came from a temporary UI test target (not committed) driving Safari (`XCUIApplication(bundleIdentifier: "com.apple.mobilesafari")`) and SpringBoard; it can write PNGs straight to a Mac path. Icon: `ictool Stash/AppIcon.icon --export-image --output-file docs/icon.png --platform iOS --rendition Default --width 256 --height 256 --scale 1` (`ictool` ships inside Icon Composer in Xcode).

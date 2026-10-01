@@ -2,7 +2,7 @@
   <img src="docs/icon.png" width="120" alt="Stash app icon">
 </p>
 
-<h1 align="center">Stash</h1>
+<h1 align="center">Stash for iPhone</h1>
 
 <p align="center"><b>Share it now. Find it later.</b></p>
 
@@ -16,6 +16,8 @@
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
 
 No account, works offline, and your saves stay on your iPhone.
+
+There's also an [Android app](../android). Both do the same things; [REQUIREMENTS.md](../../REQUIREMENTS.md) is the list.
 
 ## What it does
 
@@ -57,4 +59,4 @@ The same steps are in the app, under *Settings → Get the Most Out of Stash*.
 
 ## License
 
-[GPL-3.0](LICENSE)
+[GPL-3.0](../../LICENSE)
