@@ -27,6 +27,7 @@ public/icon.png       The iOS icon export
 ## How it works
 
 - **No local database.** Per `REQUIREMENTS.md`, the web reads and writes Supabase directly with `fetch`, no SDK. The session lives in `localStorage`. Everything loads on sign-in and again when the tab comes back (at most every 20 s): saves from the phones show up then.
+- **Email confirmation lands here.** The hosted project's Site URL is `https://g1lg1l.github.io/stash/`, so Supabase sends the confirmation link's result to this page as `#access_token=…` or `#error=…`. `fromEmailLink` in `stash.svelte.js` reads it before anything else, stores the session and clears the address bar; `EmailLink.svelte` says what happened.
 - **Writes are optimistic.** The list changes at once; a failed request puts it back and says why. Delete sets `deleted_at` (the phones pick up the tombstone), Undo clears it.
 - **Adding.** `links.js` must give the same `canonical_url` as the apps, byte for byte, or dedupe breaks across devices. `links.test.js` pins strings produced by the Android `UrlSourceDetector`; regenerate them from Android when its rules change. New saves go up as `pending` with category `other`: the browser can't fetch other sites' metadata (CORS), so a phone enriches and classifies them on its next sync (#19 moves this to the server).
 

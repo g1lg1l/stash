@@ -15,8 +15,39 @@ function loadSession() {
   }
 }
 
+/**
+ * The confirmation email's link: Supabase checks it, then opens this page (the project's Site URL) with the
+ * new session in the fragment, or why it failed (expired, already used). Read once, then out of the address bar.
+ */
+function fromEmailLink() {
+  const params = new URLSearchParams(location.hash.slice(1))
+  if (!params.has('access_token') && !params.has('error')) return null
+  history.replaceState(null, '', location.pathname + location.search)
+  if (params.has('error')) {
+    const used = params.get('error_code') === 'otp_expired'
+    return { confirmed: false, reason: used ? 'This link has expired or was already used.' : params.get('error_description') ?? "This link didn't work." }
+  }
+  let email = null
+  try {
+    email = JSON.parse(atob(params.get('access_token').split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).email
+  } catch {}
+  const session = {
+    accessToken: params.get('access_token'),
+    refreshToken: params.get('refresh_token'),
+    expiresAt: Number(params.get('expires_at')) || Math.floor(Date.now() / 1000) + Number(params.get('expires_in') ?? 3600),
+    email,
+  }
+  try {
+    localStorage.setItem('session', JSON.stringify(session))
+  } catch {}
+  return { confirmed: true, email, session }
+}
+
+/** Set when this page was opened from a confirmation email. */
+export const emailLink = fromEmailLink()
+
 export const stash = $state({
-  session: loadSession(),
+  session: emailLink?.session ?? loadSession(),
   /** Newest first, without deleted ones. Null until the first load. */
   saves: null,
   /** The one message at the bottom of the screen: { text, undo? }. */

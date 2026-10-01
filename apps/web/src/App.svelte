@@ -7,7 +7,8 @@
   import Explore from './lib/Explore.svelte'
   import Welcome from './lib/Welcome.svelte'
   import Settings from './lib/Settings.svelte'
-  import { add, load, stash, tell } from './lib/stash.svelte.js'
+  import EmailLink from './lib/EmailLink.svelte'
+  import { add, emailLink, load, stash, tell } from './lib/stash.svelte.js'
   import { byDay, categories, category, greeting, search } from './lib/feed.js'
 
   let route = $state(parse(location.hash))
@@ -17,6 +18,7 @@
   let searchField = $state()
   let fresh = $state(null)
   let lastLoad = 0
+  let landing = $state(emailLink)
 
   /** #/explore, #/search, #/category/food; anything else is Home. */
   function parse(hash) {
@@ -96,7 +98,9 @@
 />
 <svelte:document onvisibilitychange={() => document.visibilityState === 'visible' && refresh()} />
 
-{#if !stash.session}
+{#if landing}
+  <EmailLink link={landing} ondone={() => (landing = null)} />
+{:else if !stash.session}
   <Welcome />
 {:else}
   <div class="shell" class:open={selected}>
