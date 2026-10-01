@@ -7,11 +7,19 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5A0000000000000000000052 /* StashWidget.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A0000000000000000000014 /* StashWidget.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5A0000000000000000000051 /* StashActionExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A0000000000000000000013 /* StashActionExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		5A0000000000000000000050 /* StashShareExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 5A0000000000000000000011 /* StashShareExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		5A0000000000000000000066 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 5A0000000000000000000001 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5A0000000000000000000034;
+			remoteInfo = StashWidget;
+		};
 		5A0000000000000000000064 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 5A0000000000000000000001 /* Project object */;
@@ -44,6 +52,7 @@
 			files = (
 				5A0000000000000000000050 /* StashShareExtension.appex in Embed Foundation Extensions */,
 				5A0000000000000000000051 /* StashActionExtension.appex in Embed Foundation Extensions */,
+				5A0000000000000000000052 /* StashWidget.appex in Embed Foundation Extensions */,
 			);
 			name = "Embed Foundation Extensions";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -51,6 +60,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		5A0000000000000000000014 /* StashWidget.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StashWidget.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0000000000000000000013 /* StashActionExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StashActionExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0000000000000000000010 /* Stash.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Stash.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		5A0000000000000000000011 /* StashShareExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StashShareExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -58,6 +68,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		5A0000000000000000000029 /* Exceptions for "StashWidget" folder in "StashWidget" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = 5A0000000000000000000034 /* StashWidget */;
+		};
 		5A0000000000000000000027 /* Exceptions for "StashActionExtension" folder in "StashActionExtension" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -75,6 +92,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		5A0000000000000000000028 /* StashWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				5A0000000000000000000029 /* Exceptions for "StashWidget" folder in "StashWidget" target */,
+			);
+			path = StashWidget;
+			sourceTree = "<group>";
+		};
 		5A0000000000000000000025 /* StashActionExtension */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -114,6 +139,13 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		5A000000000000000000004E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A000000000000000000004B /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -154,6 +186,7 @@
 				5A0000000000000000000023 /* StashTests */,
 				5A0000000000000000000025 /* StashActionExtension */,
 				5A0000000000000000000026 /* ShareUI */,
+				5A0000000000000000000028 /* StashWidget */,
 				5A0000000000000000000003 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -164,6 +197,7 @@
 				5A0000000000000000000010 /* Stash.app */,
 				5A0000000000000000000011 /* StashShareExtension.appex */,
 				5A0000000000000000000013 /* StashActionExtension.appex */,
+				5A0000000000000000000014 /* StashWidget.appex */,
 				5A0000000000000000000012 /* StashTests.xctest */,
 			);
 			name = Products;
@@ -172,6 +206,29 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		5A0000000000000000000034 /* StashWidget */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 5A000000000000000000007F /* Build configuration list for PBXNativeTarget "StashWidget" */;
+			buildPhases = (
+				5A000000000000000000004D /* Sources */,
+				5A000000000000000000004E /* Frameworks */,
+				5A000000000000000000004F /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				5A0000000000000000000021 /* Shared */,
+				5A0000000000000000000028 /* StashWidget */,
+			);
+			name = StashWidget;
+			packageProductDependencies = (
+			);
+			productName = StashWidget;
+			productReference = 5A0000000000000000000014 /* StashWidget.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		5A0000000000000000000033 /* StashActionExtension */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 5A000000000000000000007C /* Build configuration list for PBXNativeTarget "StashActionExtension" */;
@@ -210,6 +267,7 @@
 			dependencies = (
 				5A0000000000000000000062 /* PBXTargetDependency */,
 				5A0000000000000000000065 /* PBXTargetDependency */,
+				5A0000000000000000000067 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				5A0000000000000000000020 /* Stash */,
@@ -288,6 +346,9 @@
 					5A0000000000000000000033 = {
 						CreatedOnToolsVersion = 27.0;
 					};
+					5A0000000000000000000034 = {
+						CreatedOnToolsVersion = 27.0;
+					};
 					5A0000000000000000000032 = {
 						CreatedOnToolsVersion = 27.0;
 						TestTargetID = 5A0000000000000000000030;
@@ -312,11 +373,19 @@
 				5A0000000000000000000031 /* StashShareExtension */,
 				5A0000000000000000000032 /* StashTests */,
 				5A0000000000000000000033 /* StashActionExtension */,
+				5A0000000000000000000034 /* StashWidget */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		5A000000000000000000004F /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A000000000000000000004C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -348,6 +417,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		5A000000000000000000004D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		5A000000000000000000004A /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -379,6 +455,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		5A0000000000000000000067 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5A0000000000000000000034 /* StashWidget */;
+			targetProxy = 5A0000000000000000000066 /* PBXContainerItemProxy */;
+		};
 		5A0000000000000000000065 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 5A0000000000000000000033 /* StashActionExtension */;
@@ -397,6 +478,42 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		5A0000000000000000000080 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StashWidget/StashWidget.entitlements;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StashWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Stash;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.g1lg1l.stash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Debug;
+		};
+		5A0000000000000000000081 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = StashWidget/StashWidget.entitlements;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StashWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = Stash;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.g1lg1l.stash.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+			};
+			name = Release;
+		};
 		5A000000000000000000007D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -445,7 +562,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = WZ546S44V2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -486,7 +603,7 @@
 				CLANG_ENABLE_OBJC_ARC = YES;
 				CODE_SIGN_STYLE = Automatic;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 4;
+				CURRENT_PROJECT_VERSION = 5;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = WZ546S44V2;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -614,6 +731,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		5A000000000000000000007F /* Build configuration list for PBXNativeTarget "StashWidget" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				5A0000000000000000000080 /* Debug */,
+				5A0000000000000000000081 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		5A000000000000000000007C /* Build configuration list for PBXNativeTarget "StashActionExtension" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
