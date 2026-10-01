@@ -100,6 +100,7 @@ private struct ShareView: View {
             .controlSize(.large)
         }
         .padding(24)
+        .tint(Color(.accent)) // Extensions don't pick up the app's accent color on their own.
         .sensoryFeedback(trigger: model.isSaved) { _, saved in saved ? .success : nil }
         .task(id: model.isSaved) {
             // Save and disappear: leave on our own shortly after success.
