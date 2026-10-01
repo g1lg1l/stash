@@ -105,6 +105,16 @@ Port `URLSourceDetector` rule for rule:
 - `--ez sampleData true` (debug builds) opens an in-memory store with the same 15 sample saves as iOS and never touches the real one.
 - `versionCode` goes up for each build installed on a phone.
 
+## Sync (planned, Supabase)
+Not built yet; this is the design both apps follow when they add it.
+- The device's own database stays the source of truth. The app works fully offline and without an account; signing in only turns on sync.
+- `supabase/migrations` defines the `saves` table: the same fields in snake_case, plus `user_id`, `updated_at` (set by the server on every write) and `deleted_at`. Row level security limits each user to their own rows.
+- Push: rows changed locally since the last sync are upserted by `id`. Pull: rows with `updated_at` after the last one seen. The last write to reach the server wins.
+- Delete becomes a tombstone (`deleted_at`), kept locally until it has been pushed, so other devices remove the save too.
+- Dedupe still runs on each device: two devices saving the same link offline end up with two rows, and the next `add` or pull merges them by `canonicalUrl`.
+- The web client has no local database: it reads and writes Supabase directly.
+- Only the publishable key ships in the apps. The service role key never goes in the repo.
+
 ## Platform mapping
 
 | iOS | Android |
@@ -131,4 +141,4 @@ Port `URLSourceDetector` rule for rule:
 One focused check per behavior, as on iOS: source and type detection, scheme-less links, rejected inputs, the shared URL kept as is, canonical keys (same resource merges, different resources never do), Open Graph / Twitter / title parsing, `og:type` mapping, entity decoding, oEmbed (including X), map place names, title cleaning, classification (structure, titles, weighting, URL words), fill-gaps enrichment and failure statuses, search (case, accents, every word, fields, order), day sections, rediscovery (rule and cap), the widget pick, link extraction from shared text, dedupe dates, delete, manual category through enrichment, unknown raw values, and a performance guard at 2,000 saves.
 
 ## Out of scope (same as iOS today)
-Accounts, backend, sync, AI summaries (the `summary` field exists, but nothing fills it yet), editing tags.
+AI summaries (the `summary` field exists, but nothing fills it yet), editing tags.
