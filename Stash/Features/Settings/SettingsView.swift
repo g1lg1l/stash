@@ -56,7 +56,7 @@ struct SettingsView: View {
                 } header: {
                     Text("About")
                 } footer: {
-                    Text("Don't see Stash when sharing? In the share sheet, scroll the row of apps to More, tap Edit and turn on Stash.")
+                    Text("Put Stash first when sharing: in the share sheet, scroll the row of apps to More, tap Edit and add Stash to Favorites. Do the same for Save to Stash under Edit Actions.")
                 }
             }
             .navigationTitle("Settings")
