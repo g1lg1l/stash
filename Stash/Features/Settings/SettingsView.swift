@@ -50,6 +50,11 @@ struct SettingsView: View {
 
                 Section {
                     LabeledContent("Version", value: version)
+                    Link(destination: URL(string: "https://github.com/g1lg1l/stash")!) {
+                        Label("Source Code on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                    }
+                } header: {
+                    Text("About")
                 } footer: {
                     Text("Don't see Stash when sharing? In the share sheet, scroll the row of apps to More, tap Edit and turn on Stash.")
                 }
