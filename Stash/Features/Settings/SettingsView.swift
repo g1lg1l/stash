@@ -48,15 +48,16 @@ struct SettingsView: View {
                     Text("No account. Your \(saves.count == 1 ? "save stays" : "\(saves.count) saves stay") on this iPhone. Export sends every title and link as plain text, to Notes, Files or anywhere else.")
                 }
 
-                Section {
+                Section("About") {
+                    NavigationLink {
+                        TipsView()
+                    } label: {
+                        Label("Get the Most Out of Stash", systemImage: "lightbulb")
+                    }
                     LabeledContent("Version", value: version)
                     Link(destination: URL(string: "https://github.com/g1lg1l/stash")!) {
                         Label("Source Code on GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                     }
-                } header: {
-                    Text("About")
-                } footer: {
-                    Text("Put Stash first when sharing: in the share sheet, scroll the row of apps to More, tap Edit and add Stash to Favorites. Do the same for Save to Stash under Edit Actions.")
                 }
             }
             .navigationTitle("Settings")
@@ -79,6 +80,36 @@ struct SettingsView: View {
     private var version: String {
         let info = Bundle.main.infoDictionary
         return "\(info?["CFBundleShortVersionString"] as? String ?? "?") (\(info?["CFBundleVersion"] as? String ?? "?"))"
+    }
+}
+
+/// Setup that makes saving one tap away. iOS hides new share options, so most people never find them alone.
+private struct TipsView: View {
+    var body: some View {
+        Form {
+            tip("Put Stash First in the Share Sheet", symbol: "square.and.arrow.up",
+                "In any share sheet, scroll the row of apps to More and tap Edit. Tap + next to Stash and drag it to the top.")
+            tip("Add the Save to Stash Action", symbol: "bolt",
+                "In the share sheet, tap View More, then Edit Actions at the bottom. Add Save to Stash to Favorites and drag it to the top. It saves in one tap, from the first row of actions.")
+            tip("Add the Widget", symbol: "square.text.square",
+                "Touch and hold the Home Screen, tap Edit, then Add Widget, and search for Stash. It brings back something you saved; tap it to open.")
+            tip("Come Back to Explore", symbol: "square.grid.2x2",
+                "Worth Another Look picks saves you haven't opened in a few days. Opening one retires it.")
+        }
+        .navigationTitle("Get the Most Out of Stash")
+        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func tip(_ title: LocalizedStringKey, symbol: String, _ detail: LocalizedStringKey) -> some View {
+        Label {
+            VStack(alignment: .leading, spacing: Spacing.xxs) {
+                Text(title).font(.headline)
+                Text(detail).font(.subheadline).foregroundStyle(.secondary)
+            }
+            .padding(.vertical, Spacing.xxs)
+        } icon: {
+            Image(systemName: symbol).foregroundStyle(.tint)
+        }
     }
 }
 
