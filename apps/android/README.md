@@ -15,7 +15,7 @@
 
 That recipe on Instagram, the trail on YouTube, the café a friend sent you on Maps. Share it to Stash and move on. Stash grabs the title and picture, files it by topic, and brings it back when you've forgotten about it.
 
-No account, works offline, and your saves stay on your phone. Colors follow your wallpaper.
+Works offline, and your saves stay on your phone. No account needed; sign in if you want your saves on your other devices too. Colors follow your wallpaper.
 
 There's also an [iPhone app](../ios). Both do the same things; [REQUIREMENTS.md](../../REQUIREMENTS.md) is the list.
 
@@ -26,6 +26,7 @@ There's also an [iPhone app](../ios). Both do the same things; [REQUIREMENTS.md]
 - **Brings things back:** "Worth another look" resurfaces what you saved and never opened.
 - **Finds anything:** instant search across everything you've saved.
 - **On your Home screen:** a widget shows one thing you saved. Tap it to open.
+- **Syncs, if you want:** an optional account (email and password, in *Settings → Account*) keeps your saves in sync with your other phones and the iPhone app. Signing out keeps everything on the phone. *Delete account* removes the account and the copy on the server; your saves stay on the phone.
 - Cards or a list, light or dark, swipe to mark as seen or delete (with Undo), and your links export in one tap.
 
 ## Install

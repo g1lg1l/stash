@@ -1,5 +1,6 @@
 package com.g1lg1l.stash.data
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
@@ -40,7 +41,13 @@ data class Save(
     val createdAt: Long = System.currentTimeMillis(),
     val lastSavedAt: Long = createdAt,
     val openedAt: Long? = null,
+    /** Local time of the last change made on this device, so sync knows what to push. Pulled changes leave it alone. */
+    @ColumnInfo(defaultValue = "0") val modifiedAt: Long = 0,
 )
+
+/** A save deleted while signed in, until sync has told the server. */
+@Entity(tableName = "tombstones")
+data class Tombstone(@PrimaryKey val id: String, val deletedAt: Long)
 
 val Source.displayName: String
     get() = when (this) {

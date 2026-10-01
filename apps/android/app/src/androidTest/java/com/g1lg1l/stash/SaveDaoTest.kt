@@ -7,6 +7,7 @@ import com.g1lg1l.stash.data.Category
 import com.g1lg1l.stash.data.ContentType
 import com.g1lg1l.stash.data.Enricher
 import com.g1lg1l.stash.data.LinkMetadata
+import com.g1lg1l.stash.data.RemoteSave
 import com.g1lg1l.stash.data.SampleData
 import com.g1lg1l.stash.data.Save
 import com.g1lg1l.stash.data.SaveDao
@@ -21,6 +22,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -100,6 +102,33 @@ class SaveDaoTest {
         val save = add("https://example.com/a", at = 1)
         dao.delete(save)
         assertEquals(0, all().size)
+    }
+
+    @Test fun localChangesAreMarkedForSyncAndNoOpsAreNot() = runBlocking {
+        val save = add("https://example.com/a", at = 1)
+        assertTrue(save.modifiedAt > 0)
+        dao.update(save.id) { it }
+        assertEquals(save.modifiedAt, dao.get(save.id)?.modifiedAt)
+        Thread.sleep(2)
+        dao.update(save.id) { it.withCategory(Category.FOOD) }
+        assertTrue(requireNotNull(dao.get(save.id)).modifiedAt > save.modifiedAt)
+    }
+
+    @Test fun aDeleteWhileSignedInLeavesATombstoneThatUndoClears() = runBlocking {
+        val save = add("https://example.com/a", at = 1)
+        dao.delete(save, tombstone = true)
+        assertEquals(listOf(save.id), dao.tombstones().map { it.id })
+        dao.restore(save)
+        assertTrue(dao.tombstones().isEmpty())
+        assertEquals(1, all().size)
+    }
+
+    @Test fun aPulledCopyOfTheSameLinkMergesIntoOneSave() = runBlocking {
+        val local = add("https://www.youtube.com/watch?v=kCc8FmEb1nY", at = 1)
+        val server = local.copy(id = "00000000-0000-0000-0000-000000000000", title = "From the other phone", modifiedAt = 0)
+        dao.applyPull(listOf(RemoteSave(server, deleted = false)), pushStart = System.currentTimeMillis())
+        assertEquals(listOf(server.id), all().map { it.id })
+        assertEquals(listOf(local.id), dao.tombstones().map { it.id })
     }
 
     @Test fun newestFirst() = runBlocking {

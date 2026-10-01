@@ -191,7 +191,10 @@ fun DetailScreen(save: Save?) {
                 TextButton({
                     confirmingDelete = false
                     backStack.removeLastOrNull()
-                    Stash.scope.launch { Stash.delete(save) }
+                    Stash.scope.launch {
+                        Stash.delete(save)
+                        Stash.forgetThumbnail(save)
+                    }
                 }) { Text("Delete", color = MaterialTheme.colorScheme.error) }
             },
             dismissButton = { TextButton({ confirmingDelete = false }) { Text("Cancel") } },

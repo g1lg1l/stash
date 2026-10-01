@@ -511,10 +511,10 @@ fun Context.share(text: String, subject: String? = null) {
 /** Deletes right away and offers Undo. The cached thumbnail goes only once Undo is no longer possible. */
 fun deleteWithUndo(save: Save, snackbar: SnackbarHostState) {
     Stash.scope.launch {
-        Stash.dao.delete(save)
+        Stash.delete(save)
         snackbar.currentSnackbarData?.dismiss()
         val result = snackbar.showSnackbar("Removed from your stash", actionLabel = "Undo", duration = SnackbarDuration.Short)
-        if (result == SnackbarResult.ActionPerformed) Stash.dao.upsert(save) else Stash.forgetThumbnail(save)
+        if (result == SnackbarResult.ActionPerformed) Stash.dao.restore(save) else Stash.forgetThumbnail(save)
     }
 }
 

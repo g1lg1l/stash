@@ -126,6 +126,22 @@ object Prefs {
     var theme by enumPref(Theme.SYSTEM)
     var feedLayout by enumPref(FeedLayout.CARDS)
     var showRediscovery by Pref({ it as? Boolean ?: true }) { key, value -> putBoolean(key, value) }
+    var seenWelcome by Pref({ it as? Boolean ?: false }) { key, value -> putBoolean(key, value) }
+
+    // The account session and the sync cursors. App-private, so the tokens stay with the app.
+    var email by stringPref()
+    var accessToken by stringPref()
+    var refreshToken by stringPref()
+    /** Unix seconds, as the server sends it. */
+    var expiresAt by longPref()
+    var lastPushedAt by longPref()
+    /** The server's last `updated_at`, the exact string it sent. */
+    var pullCursor by stringPref()
+    var lastSyncedAt by longPref()
+    var syncError by stringPref()
+
+    private fun stringPref() = Pref({ it as? String }) { key, value -> putString(key, value) }
+    private fun longPref() = Pref({ it as? Long ?: 0L }) { key, value -> putLong(key, value) }
 
     private inline fun <reified E : Enum<E>> enumPref(default: E) =
         Pref({ raw -> enumValues<E>().find { it.raw == raw } ?: default }) { key, value -> putString(key, value.raw) }

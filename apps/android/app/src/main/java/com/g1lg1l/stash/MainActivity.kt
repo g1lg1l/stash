@@ -42,6 +42,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.g1lg1l.stash.data.Category
 import com.g1lg1l.stash.data.Save
 import com.g1lg1l.stash.data.Stash
+import com.g1lg1l.stash.data.Sync
+import com.g1lg1l.stash.ui.AuthScreen
 import com.g1lg1l.stash.ui.CategoryScreen
 import com.g1lg1l.stash.ui.DetailScreen
 import com.g1lg1l.stash.ui.ExploreScreen
@@ -49,10 +51,12 @@ import com.g1lg1l.stash.ui.HomeScreen
 import com.g1lg1l.stash.ui.LocalBackStack
 import com.g1lg1l.stash.ui.LocalSharedTransition
 import com.g1lg1l.stash.ui.LocalSnackbar
+import com.g1lg1l.stash.ui.Prefs
 import com.g1lg1l.stash.ui.SearchScreen
 import com.g1lg1l.stash.ui.SettingsScreen
 import com.g1lg1l.stash.ui.StashTheme
 import com.g1lg1l.stash.ui.TipsScreen
+import com.g1lg1l.stash.ui.WelcomeScreen
 import com.g1lg1l.stash.ui.open
 import com.g1lg1l.stash.widget.StashWidget
 import kotlinx.coroutines.launch
@@ -63,6 +67,8 @@ import kotlinx.serialization.Serializable
 @Serializable data class CategoryFeed(val category: Category) : NavKey
 @Serializable data object Settings : NavKey
 @Serializable data object Tips : NavKey
+@Serializable data object Welcome : NavKey
+@Serializable data class Auth(val create: Boolean) : NavKey
 
 class MainActivity : ComponentActivity() {
     /** A save to open, from the widget (`stash://save/<id>`). */
@@ -85,14 +91,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onStart() {
         super.onStart()
-        // Fill in anything shared while Stash was in the background.
+        // Fill in anything shared while Stash was in the background, and sync.
         Stash.scope.launch { Stash.refresh() }
     }
 
     override fun onStop() {
         super.onStop()
-        // Leaving the app is when saves have changed: refresh the Home Screen widget here.
-        Stash.scope.launch { StashWidget().updateAll(applicationContext) }
+        // Leaving the app is when saves have changed: refresh the Home Screen widget here, and push them.
+        Stash.scope.launch {
+            StashWidget().updateAll(applicationContext)
+            Sync.sync()
+        }
     }
 
     private fun saveId(intent: Intent) = intent.data?.takeIf { it.scheme == "stash" && it.host == "save" }?.lastPathSegment
@@ -101,7 +110,7 @@ class MainActivity : ComponentActivity() {
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun StashRoot(openSave: MutableState<String?>) {
-    val backStack = rememberNavBackStack(Tabs)
+    val backStack = rememberNavBackStack(if (Prefs.seenWelcome) Tabs else Welcome)
     val snackbar = remember { SnackbarHostState() }
     // Blank for the first few milliseconds rather than flashing an empty stash.
     val saves = Stash.saves.collectAsStateWithLifecycle().value ?: return
@@ -123,6 +132,8 @@ private fun StashRoot(openSave: MutableState<String?>) {
                         entry<CategoryFeed> { route -> CategoryScreen(route.category, saves) }
                         entry<Settings> { SettingsScreen(saves) }
                         entry<Tips> { TipsScreen() }
+                        entry<Welcome> { WelcomeScreen() }
+                        entry<Auth> { route -> AuthScreen(route.create) }
                     },
                 )
             }

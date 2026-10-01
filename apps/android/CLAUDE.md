@@ -1,6 +1,6 @@
 # Stash for Android
 
-Native Android "save for later" inbox. Kotlin, Jetpack Compose, Material 3 with dynamic color, Room, Android 12+ (minSdk 31, target 37). No account, no backend yet (planned in the GitHub issues). Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/android`.
+Native Android "save for later" inbox. Kotlin, Jetpack Compose, Material 3 with dynamic color, Room, Android 12+ (minSdk 31, target 37). Works without an account; an optional one syncs through Supabase (`supabase/` at the repo root). Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/android`.
 
 ## Build, test, install
 
@@ -9,8 +9,8 @@ There's no global Gradle or JDK on this Mac: use the wrapper with Android Studio
 ```sh
 export JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home"
 
-./gradlew testDebugUnitTest            # JVM tests: detection, parsing, classification, search, feed
-./gradlew connectedDebugAndroidTest    # Room tests, on a running emulator or phone
+./gradlew testDebugUnitTest            # JVM tests: detection, parsing, classification, search, feed, pull rules
+./gradlew connectedDebugAndroidTest    # Room tests and the schema migration, on a running emulator or phone
 ./gradlew installDebug                 # or installRelease: minified and much smoother, signed with the debug key
 ```
 
@@ -24,7 +24,7 @@ Bump `versionCode` in `app/build.gradle.kts` for each build installed on a phone
 app/src/main/java/com/g1lg1l/stash/
   data/         Save (Room entity), Store (DAO, database, the Stash singleton), UrlSourceDetector,
                 Classification, Metadata (oEmbed / Open Graph + the enricher), Feed (search, day sections,
-                rediscovery, widget pick), SampleData
+                rediscovery, widget pick), Sync (account, push/pull, the pure pull rules), SampleData
   ui/           Theme (tokens, Material You, icons, tints, Prefs), Components, one file per screen
   widget/       Home screen widget (Glance)
   MainActivity  Tabs, navigation (Navigation 3), widget deep links
@@ -39,10 +39,11 @@ docs/              README icon and screenshots
 
 ## How it works
 
-- **Share hand-off.** `ShareActivity` runs in the app's own process, so it writes to Room directly (`SaveDao.add` dedupes by `canonicalUrl`); there's no inbox like the iOS extensions need. It then starts enrichment in `Stash.scope`, which outlives the sheet.
+- **Share hand-off.** `ShareActivity` runs in the app's own process, so it writes to Room directly (`SaveDao.add` dedupes by `canonicalUrl`); there's no inbox like the iOS extensions need. It then starts enrichment and sync in `Stash.scope`, which outlives the sheet.
 - **Enrichment.** `Enricher` fetches oEmbed (YouTube, TikTok, X, Spotify) or Open Graph, at most four at a time. It fills gaps only, never overwrites, and a failure never loses a save. Offline stays pending; "the page had nothing" is failed and retried once per launch and on pull to refresh. It runs when `MainActivity` starts, after a share, and on pull to refresh. Each result goes through `SaveDao.update`, which reads the row inside a transaction, so a background write never undoes an edit.
-- **State.** One `Stash.saves` StateFlow (newest first) feeds every screen, like `@Query` on iOS; screens filter in memory. Preferences are `Prefs` (SharedPreferences mirrored into Compose state): `theme`, `feedLayout`, `showRediscovery`, the same keys as iOS. The theme goes through `UiModeManager.setApplicationNightMode`, so the system applies it to the splash screen too (the activity is recreated; the back stack survives).
-- **Widget.** Glance, in the app process, collecting `Stash.saves` while it's showing. It shows `Rediscovery.widgetPick`. It refreshes when `MainActivity` stops, after enrichment, and every 4 hours. Tapping opens `stash://save/<id>` through an explicit intent (no intent filter needed); `MainActivity` is `singleTop` and pushes the detail screen.
+- **Sync.** Optional, per the "Account and sync" section of `REQUIREMENTS.md`. `Account` talks to Supabase over plain HTTPS through `MetadataService.client` (no SDK); the session and both cursors live in `Prefs`. Every local write path bumps `Save.modifiedAt`: `SaveDao.add`, `SaveDao.update` (only when the change changes something, so offline enrichment isn't pushed), `restore` (Undo). Deletes go through `Stash.delete`, which leaves a `Tombstone` when signed in. `Sync.sync()` pushes saves with `modifiedAt > lastPushedAt` and the tombstones, then pulls pages and applies each in one `SaveDao.applyPull` transaction through the pure `pullChanges`, which never bumps `modifiedAt` except for a `canonicalUrl` merge. It runs inside `Stash.refresh` (start, after a share, pull to refresh, side by side with enrichment), on `MainActivity.onStop`, on Sync now and after sign-in; one at a time. Pushed rows send `deleted_at: null`, so a save brought back with Undo after its tombstone reached the server comes back there too.
+- **State.** One `Stash.saves` StateFlow (newest first) feeds every screen, like `@Query` on iOS; screens filter in memory. Preferences are `Prefs` (SharedPreferences mirrored into Compose state): `theme`, `feedLayout`, `showRediscovery`, `seenWelcome`, the same keys as iOS, plus the session and sync cursors. The theme goes through `UiModeManager.setApplicationNightMode`, so the system applies it to the splash screen too (the activity is recreated; the back stack survives).
+- **Widget.** Glance, in the app process, collecting `Stash.saves` while it's showing. It shows `Rediscovery.widgetPick`. It refreshes when `MainActivity` stops, after enrichment, after a sync that pulled something, and every 4 hours. Tapping opens `stash://save/<id>` through an explicit intent (no intent filter needed); `MainActivity` is `singleTop` and pushes the detail screen.
 - **Classification.** `Classification` is local keyword scoring, structural rules first (Maps → Places, Spotify → Music). A category picked by hand (`categoryIsManual`) always wins.
 
 ## Conventions
@@ -60,6 +61,9 @@ docs/              README icon and screenshots
 - Spotify pages bounce every browser to an open-in-the-app link with no metadata: only its oEmbed works. The iOS app doesn't use it yet.
 - The first launch of a debug build on the emulator takes a few seconds to draw; take screenshots after that. Debug builds also scroll less smoothly than release.
 - The Undo snackbar lasts 4 seconds. Scripted taps that wait on `uiautomator dump` in between will miss it.
+- `addQueryParameter` percent-encodes the pull cursor (`+` → `%2B`, and `:` too, which PostgREST accepts). Building the query by hand sends `+00:00` as a space and the server rejects it.
+- Against the local Supabase stack (`supabase start`), the emulator reaches it at `http://10.0.2.2:54321`; that needs `android:usesCleartextTraffic` and the local publishable key, both temporary. To test a session expiring, force-stop the app and set `expiresAt` to 0 in `shared_prefs/prefs.xml` through `adb shell run-as com.g1lg1l.stash`.
+- An instrumented `@Test fun x() = runBlocking { … }` whose last expression isn't Unit fails as "Failed to instantiate test runner class": declare `: Unit`.
 - The Pixel launcher on the emulator doesn't show Glance's generated widget previews, so `stash_widget_info.xml` uses `drawable-nodpi/widget_preview.png`, a crop of the real widget. Retake it when the widget's look changes.
 
 ## Screenshots
