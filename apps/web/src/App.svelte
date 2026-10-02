@@ -135,6 +135,7 @@
       </button>
     </aside>
 
+    <div class="content">
     <main>
       {#if route.view === 'home'}
         <header class="hello">
@@ -189,6 +190,7 @@
         </div>
       {/if}
     </main>
+    </div>
 
     {#if selected}
       <button class="scrim" aria-label="Close" tabindex="-1" onclick={() => (selectedId = null)}></button>
@@ -348,6 +350,21 @@
 
   /* Main column */
 
+  .content {
+    min-width: 0;
+  }
+
+  /* Side by side, the list and the detail scroll on their own, each with its scrollbar at its own edge. */
+  @media (min-width: 1181px) {
+    .shell {
+      height: 100dvh;
+    }
+
+    .content {
+      overflow-y: auto;
+    }
+  }
+
   main {
     width: 100%;
     max-width: 780px;
@@ -427,22 +444,15 @@
 
   /* Detail */
 
-  /* Beside the page's own scrollbar, the panel's stays out of sight until the pointer is over it. */
   .panel {
     position: sticky;
     top: 0;
     height: 100dvh;
     overflow-y: auto;
     overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
     border-left: 1px solid var(--line);
     background: var(--paper);
     animation: slide 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
-  }
-
-  .panel:hover {
-    scrollbar-color: var(--wash-strong) transparent;
   }
 
   @keyframes slide {
