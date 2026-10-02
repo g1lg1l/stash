@@ -2,7 +2,9 @@ package com.g1lg1l.stash.ui
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsBottomHeight
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.layout.windowInsetsTopHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -67,6 +70,7 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.g1lg1l.stash.R
@@ -129,13 +133,6 @@ fun DetailScreen(save: Save?) {
             Column(Modifier.padding(horizontal = Spacing.l, vertical = Spacing.l), verticalArrangement = Arrangement.spacedBy(Spacing.l)) {
                 Header(save, article)
 
-                // App links hand YouTube, Spotify, Maps etc. to their apps; everything else opens in the browser.
-                Button({ context.openOriginal(save) }, Modifier.fillMaxWidth().height(56.dp)) {
-                    Icon(painterResource(R.drawable.ic_open_in_new), contentDescription = null, modifier = Modifier.size(20.dp))
-                    Spacer(Modifier.size(Spacing.xs))
-                    Text("Open original", style = MaterialTheme.typography.titleMedium)
-                }
-
                 save.summary?.let { summary ->
                     Column(verticalArrangement = Arrangement.spacedBy(Spacing.xs)) {
                         Text("Summary", style = MaterialTheme.typography.titleMedium, modifier = Modifier.semantics { heading() })
@@ -159,7 +156,24 @@ fun DetailScreen(save: Save?) {
 
                 Footer(save)
             }
+            // Room to scroll the footer out from under the pinned button.
+            Spacer(Modifier.height(56.dp + Spacing.m * 2))
             Spacer(Modifier.windowInsetsBottomHeight(WindowInsets.navigationBars))
+        }
+
+        // What a save is for: pinned at the bottom, never pushed out of sight by a long title.
+        // App links hand YouTube, Spotify, Maps etc. to their apps; everything else opens in the browser.
+        Box(
+            Modifier.align(Alignment.BottomCenter).fillMaxWidth()
+                .background(Brush.verticalGradient(0f to Color.Transparent, 0.3f to MaterialTheme.colorScheme.surface))
+                .windowInsetsPadding(WindowInsets.navigationBars)
+                .padding(horizontal = Spacing.l, vertical = Spacing.m),
+        ) {
+            Button({ context.openOriginal(save) }, Modifier.fillMaxWidth().height(56.dp)) {
+                Icon(painterResource(R.drawable.ic_open_in_new), contentDescription = null, modifier = Modifier.size(20.dp))
+                Spacer(Modifier.size(Spacing.xs))
+                Text("Open original", style = MaterialTheme.typography.titleMedium)
+            }
         }
 
         TopAppBar(
@@ -212,12 +226,19 @@ private fun Header(save: Save, article: Boolean) {
                 CategoryMenu(save)
             }
         }
+        // X posts arrive with the whole post as their title: three lines, and the rest on a tap.
+        var expanded by rememberSaveable(save.id) { mutableStateOf(false) }
         Text(
             save.displayTitle,
             style = MaterialTheme.typography.headlineMedium.copy(
                 fontWeight = FontWeight.Bold, fontFamily = if (article) FontFamily.Serif else null,
             ),
-            modifier = Modifier.semantics { heading() },
+            maxLines = if (expanded) Int.MAX_VALUE else 3,
+            overflow = TextOverflow.Ellipsis,
+            modifier = Modifier
+                .animateContentSize()
+                .clickable(interactionSource = null, indication = null) { expanded = !expanded }
+                .semantics { heading() },
         )
         save.author?.let {
             Text(it, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
