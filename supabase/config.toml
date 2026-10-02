@@ -390,6 +390,10 @@ deno_version = 2
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 
+# pg_cron wakes it (supabase/migrations/*_smart_categories.sql) without a JWT; it only works through saves already due.
+[functions.smart-categories]
+verify_jwt = false
+
 [analytics]
 enabled = true
 port = 54327
