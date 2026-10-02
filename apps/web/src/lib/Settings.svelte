@@ -1,10 +1,11 @@
 <script>
-  import { deleteAccount, signOut, stash, tell } from './stash.svelte.js'
+  import { deleteAccount, setSmartCategories, signOut, stash, tell } from './stash.svelte.js'
 
   let { open = $bindable(false) } = $props()
   let dialog = $state()
   let confirming = $state(false)
   let busy = $state(false)
+  let savingSmart = $state(false)
   let theme = $state(storedTheme())
 
   function storedTheme() {
@@ -28,6 +29,18 @@
       if (value === 'system') localStorage.removeItem('theme')
       else localStorage.setItem('theme', value)
     } catch {}
+  }
+
+  async function smart(input) {
+    savingSmart = true
+    try {
+      await setSmartCategories(input.checked)
+    } catch (error) {
+      input.checked = !input.checked
+      tell(error.message)
+    } finally {
+      savingSmart = false
+    }
   }
 
   async function destroy() {
@@ -67,6 +80,11 @@
         {/if}
       </div>
       {#if confirming}<p class="note">The copies on your phones stay there.</p>{/if}
+      <label class="smart">
+        <input type="checkbox" switch checked={stash.session?.smartCategories ?? false} disabled={savingSmart} onchange={(e) => smart(e.currentTarget)} />
+        Smart categories
+      </label>
+      <p class="note">Gemini sorts the saves you haven't filed by hand, on every device. Their titles, descriptions and links are sent to Google.</p>
     </section>
 
     <section>
@@ -156,6 +174,21 @@
 
   .plain:hover {
     background: color-mix(in srgb, var(--ink) 12%, var(--sheet));
+  }
+
+  .smart {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+    font-weight: 600;
+  }
+
+  .smart input {
+    width: 20px;
+    height: 20px;
+    margin: 0;
+    accent-color: var(--accent);
   }
 
   .danger {
