@@ -139,6 +139,8 @@ object Prefs {
     var pullCursor by stringPref()
     var lastSyncedAt by longPref()
     var syncError by stringPref()
+    /** Kept by the server in the account's user metadata; mirrored here from sign-in and each refresh. */
+    var smartCategories by Pref({ it as? Boolean ?: false }) { key, value -> putBoolean(key, value) }
 
     private fun stringPref() = Pref({ it as? String }) { key, value -> putString(key, value) }
     private fun longPref() = Pref({ it as? Long ?: 0L }) { key, value -> putLong(key, value) }

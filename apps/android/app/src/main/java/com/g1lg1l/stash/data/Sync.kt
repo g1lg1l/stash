@@ -145,6 +145,12 @@ object Account {
         forget()
     }
 
+    /** Smart categories run on the server, so the choice lives with the account, where every device sees it. */
+    suspend fun setSmartCategories(on: Boolean) {
+        authorized("PUT", url("auth/v1/user").build(), JSONObject().put("data", JSONObject().put("smart_categories", on)).toString())
+        Prefs.smartCategories = on
+    }
+
     /** The account and the copy on the server go; the saves on this device stay. */
     suspend fun deleteAccount() {
         authorized("POST", url("rest/v1/rpc/delete_account").build(), "{}")
@@ -187,6 +193,8 @@ object Account {
         Prefs.accessToken = session.getString("access_token")
         Prefs.refreshToken = session.getString("refresh_token")
         Prefs.expiresAt = session.optLong("expires_at", System.currentTimeMillis() / 1000 + session.optLong("expires_in", 3600))
+        // What another device set comes back with sign-in and every refresh.
+        Prefs.smartCategories = session.optJSONObject("user")?.optJSONObject("user_metadata")?.optBoolean("smart_categories") ?: false
     }
 
     private fun forget() {
@@ -198,6 +206,7 @@ object Account {
         Prefs.pullCursor = null
         Prefs.lastSyncedAt = 0
         Prefs.syncError = null
+        Prefs.smartCategories = false
     }
 
     private suspend fun request(method: String, url: HttpUrl, body: String? = null, token: String? = null, prefer: String? = null): String =

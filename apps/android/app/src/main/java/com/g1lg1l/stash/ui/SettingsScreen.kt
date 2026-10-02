@@ -96,6 +96,21 @@ fun SettingsScreen(saves: List<Save>) {
                 leadingContent = { Icon(painterResource(R.drawable.ic_account_circle), contentDescription = null) },
             )
             ListItem(
+                headlineContent = { Text("Smart categories") },
+                supportingContent = { Text("Gemini sorts the saves you haven't filed by hand, on every device. Their titles, descriptions and links are sent to Google.") },
+                leadingContent = { Icon(painterResource(R.drawable.ic_lightbulb), contentDescription = null) },
+                trailingContent = { Switch(Prefs.smartCategories, onCheckedChange = null) },
+                modifier = Modifier.clickable {
+                    Stash.scope.launch {
+                        try {
+                            Account.setSmartCategories(!Prefs.smartCategories)
+                        } catch (e: Exception) {
+                            Prefs.syncError = Account.describe(e)
+                        }
+                    }
+                },
+            )
+            ListItem(
                 headlineContent = { Text("Sync now") },
                 leadingContent = { Icon(painterResource(R.drawable.ic_sync), contentDescription = null) },
                 modifier = Modifier.clickable(enabled = !Sync.syncing) { Stash.scope.launch { Sync.sync() } },
