@@ -6,7 +6,7 @@
 apps/ios/        iPhone app: Swift 6, SwiftUI, SwiftData, iOS 26+         (see apps/ios/CLAUDE.md)
 apps/android/    Android app: Kotlin, Compose, Room, Android 12+          (see apps/android/CLAUDE.md)
 apps/web/        Web client: Svelte 5 + Vite, on GitHub Pages                (see apps/web/CLAUDE.md)
-supabase/        Backend (free tier): migrations/ is the schema, tests/ the RLS checks
+supabase/        Backend (free tier): migrations/ is the schema, tests/ the pgTAP checks, functions/ the Edge Functions
 .github/         web.yml tests, builds and deploys apps/web on every push to main
 REQUIREMENTS.md  Features and behavior both apps implement, including how sync will work
 ```
@@ -15,7 +15,7 @@ Add workspace tooling (pnpm workspaces, `packages/`) only once two JS projects s
 
 Email confirmation is on, locally too: confirmation emails land in Mailpit (http://127.0.0.1:54324). `config.toml` holds the hosted project's auth settings (`supabase config push` sends them): `site_url` is the web client on GitHub Pages, where links from the apps' sign-ups land; the web asks for its own URL with `redirect_to`, allowed for the dev server through `additional_redirect_urls`.
 
-Supabase runs locally in Docker, no account needed: `supabase db start` (just Postgres), `supabase test db`, `supabase stop`; `supabase start` brings up the whole stack with Studio. The CLI is from `brew install supabase/tap/supabase`. A new schema change is `supabase migration new <name>`, never an edit to an existing migration. The hosted project is connected to the repo through Supabase's GitHub integration, so pushing to `main` deploys new migrations.
+Supabase runs locally in Docker, no account needed: `supabase db start` (just Postgres), `supabase test db`, `supabase stop`; `supabase start` brings up the whole stack with Studio. The CLI is from `brew install supabase/tap/supabase`. A new schema change is `supabase migration new <name>`, never an edit to an existing migration. Pushing to `main` does not reach the hosted project (the GitHub integration doesn't deploy): the linked CLI does, by hand, after the push: `supabase db push` (migrations), `supabase functions deploy <name>`, `supabase config push` (auth settings). Edge Function secrets (`GEMINI_STASH_API_KEY`) are set in the dashboard or with `supabase secrets set`, never in the repo.
 
 Run each platform's commands from its own folder (`cd apps/android && ./gradlew …`, `xcodebuild -project apps/ios/Stash.xcodeproj …`, `cd apps/web && npm test`).
 
