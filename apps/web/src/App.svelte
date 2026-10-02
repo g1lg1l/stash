@@ -427,14 +427,22 @@
 
   /* Detail */
 
+  /* Beside the page's own scrollbar, the panel's stays out of sight until the pointer is over it. */
   .panel {
     position: sticky;
     top: 0;
     height: 100dvh;
     overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
     border-left: 1px solid var(--line);
     background: var(--paper);
     animation: slide 260ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .panel:hover {
+    scrollbar-color: var(--wash-strong) transparent;
   }
 
   @keyframes slide {
@@ -489,8 +497,12 @@
     display: none;
   }
 
-  /* Narrower: the detail floats over the list instead of taking a column. */
+  /* Narrower: the detail floats over the list instead of taking a column, and the list holds still under it. */
   @media (max-width: 1180px) {
+    :global(html:has(.panel)) {
+      overflow: hidden;
+    }
+
     .shell.open {
       grid-template-columns: var(--sidebar) minmax(0, 1fr);
     }
