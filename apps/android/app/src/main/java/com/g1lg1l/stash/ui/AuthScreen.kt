@@ -51,7 +51,8 @@ fun AuthScreen(create: Boolean) {
     var busy by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
     var note by remember { mutableStateOf<String?>(null) }
-    val valid = email.isNotBlank() && password.length >= 6
+    // Accounts made before the minimum went up to 8 still sign in with 6.
+    val valid = email.isNotBlank() && password.length >= if (creating) 8 else 1
 
     fun submit() {
         if (!valid || busy) return
@@ -93,7 +94,7 @@ fun AuthScreen(create: Boolean) {
             OutlinedTextField(
                 password, { password = it },
                 label = { Text("Password") },
-                supportingText = if (creating) ({ Text("At least 6 characters") }) else null,
+                supportingText = if (creating) ({ Text("At least 8 characters") }) else null,
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
