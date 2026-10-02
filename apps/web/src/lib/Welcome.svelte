@@ -47,11 +47,11 @@
     </label>
     <label>
       <span>Password</span>
-      <input bind:value={password} type="password" autocomplete={create ? 'new-password' : 'current-password'} minlength="6" required />
-      {#if create}<small>At least 6 characters.</small>{/if}
+      <input bind:value={password} type="password" autocomplete={create ? 'new-password' : 'current-password'} minlength={create ? 8 : undefined} required />
+      {#if create}<small>At least 8 characters.</small>{/if}
     </label>
     {#if message}<p class="message" role="alert">{message}</p>{/if}
-    <button class="primary" disabled={busy || !email.trim() || password.length < 6}>
+    <button class="primary" disabled={busy || !email.trim() || password.length < (create ? 8 : 1)}>
       {busy ? (create ? 'Creating account…' : 'Signing in…') : create ? 'Create account' : 'Sign in'}
     </button>
   </form>
