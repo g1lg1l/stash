@@ -6,6 +6,8 @@
 
   let { save, onclose } = $props()
   const cat = $derived(category(save))
+  // X posts arrive with the whole post as their title: three lines, and the rest on a tap.
+  let expanded = $state(false)
   const sourceIcons = { instagram: 'photo_camera', youtube: 'smart_display', tiktok: 'smart_display', reddit: 'forum', x: 'chat', spotify: 'music_note', maps: 'location_on' }
 
   // Opening a save is seeing it, as in the apps. Only when another one opens, not when it's marked unseen here.
@@ -61,12 +63,10 @@
       </label>
     </div>
 
-    <h1 class:serif={save.content_type === 'article'}>{displayTitle(save)}</h1>
+    <h1 class:serif={save.content_type === 'article'}>
+      <button class="title" aria-expanded={expanded} onclick={() => (expanded = !expanded)}><span class:clamped={!expanded}>{displayTitle(save)}</span></button>
+    </h1>
     {#if save.author}<p class="author">{save.author}</p>{/if}
-
-    <a class="primary open" href={save.url} target="_blank" rel="noopener noreferrer" onclick={() => setSeen(save, true)}>
-      <Icon name="open_in_new" size={20} />Open original
-    </a>
 
     {#if save.summary}
       <h2>Summary</h2>
@@ -87,11 +87,20 @@
       <p class="url">{save.url}</p>
     </footer>
   </div>
+
+  <!-- What a save is for: pinned at the bottom, never pushed out of sight by a long title. -->
+  <div class="cta">
+    <a class="primary" href={save.url} target="_blank" rel="noopener noreferrer" onclick={() => setSeen(save, true)}>
+      <Icon name="open_in_new" size={20} />Open original
+    </a>
+  </div>
 </article>
 
 <style>
   .detail {
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 100%;
     background: var(--paper);
   }
@@ -126,9 +135,11 @@
   }
 
   .body {
+    flex: 1;
     display: grid;
+    align-content: start;
     gap: 16px;
-    padding: 20px 28px 40px;
+    padding: 20px 28px 24px;
   }
 
   .labels {
@@ -184,6 +195,26 @@
     overflow-wrap: anywhere;
   }
 
+  .title {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-weight: inherit;
+    line-height: inherit;
+    letter-spacing: inherit;
+    text-align: left;
+    text-wrap: inherit;
+  }
+
+  .clamped {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
   .serif {
     font-family: ui-serif, 'New York', Georgia, serif;
     letter-spacing: -0.01em;
@@ -196,8 +227,15 @@
     font-weight: 560;
   }
 
-  .open {
-    margin: 4px 0;
+  .cta {
+    position: sticky;
+    bottom: 0;
+    padding: 20px 28px calc(20px + env(safe-area-inset-bottom));
+    background: linear-gradient(transparent, var(--paper) 20px);
+  }
+
+  .cta a {
+    width: 100%;
     min-height: 52px;
   }
 
