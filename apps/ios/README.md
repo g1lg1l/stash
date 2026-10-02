@@ -36,6 +36,8 @@ Stash never asks for an account. If you want your saves on more than one device,
 
 ## Install
 
+There's no iPhone release yet: no App Store or TestFlight build, since both need the paid Apple Developer Program. Build it from this repo on your Mac instead.
+
 You need a Mac with Xcode 27+, an iPhone on iOS 26+, and an Apple ID (a free one works).
 
 1. Connect the iPhone and tap **Trust**. If iOS asks, turn on *Settings → Privacy & Security → Developer Mode*.

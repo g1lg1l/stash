@@ -31,6 +31,16 @@ There's also an [iPhone app](../ios). Both do the same things; [REQUIREMENTS.md]
 
 ## Install
 
+**[Download stash.apk](https://github.com/g1lg1l/stash/releases/latest/download/stash.apk)** from the [latest release](https://github.com/g1lg1l/stash/releases/latest). It needs Android 12 or later.
+
+1. Open the link on the phone and download the file.
+2. Open it. Android asks to let your browser (or Files) install apps: allow it, go back and tap **Install**.
+3. If Play Protect warns about an unknown app, tap **More details → Install anyway**. It warns because the APK doesn't come from the Play Store.
+
+A newer release installs over it and keeps your saves. If you installed Stash from Android Studio on another computer, uninstall that copy first: Android only updates an app signed with the same key.
+
+### Build it yourself
+
 You need an Android phone on Android 12 or later, a USB cable, and a Mac, Windows or Linux computer with [Android Studio](https://developer.android.com/studio).
 
 1. On the phone, turn on developer options: *Settings → About phone*, tap **Build number** seven times. Then turn on *Settings → System → Developer options → USB debugging*.
