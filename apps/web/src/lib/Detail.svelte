@@ -11,6 +11,8 @@
   // X posts arrive with the whole post as their title: three lines, and the rest on a tap.
   let expanded = $state(false)
   const sourceIcons = { instagram: 'photo_camera', youtube: 'smart_display', tiktok: 'smart_display', reddit: 'forum', x: 'chat', spotify: 'music_note', maps: 'location_on' }
+  // Links to a known app say so, with its icon: on a phone they open in that app.
+  const app = $derived(sourceIcons[save.source] ? sourceName(save) : null)
 
   // Opening a save is seeing it, as in the apps. Only when another one opens, not when it's marked unseen here.
   $effect(() => {
@@ -93,7 +95,7 @@
   <!-- What a save is for: pinned at the bottom, never pushed out of sight by a long title. -->
   <div class="cta">
     <a class="primary" href={link} target="_blank" rel="noopener noreferrer" onclick={() => setSeen(save, true)}>
-      <Icon name="open_in_new" size={20} />Open original
+      <Icon name={sourceIcons[save.source] ?? 'open_in_new'} size={20} />{app ? `Open in ${app}` : 'Open original'}
     </a>
   </div>
 </article>
