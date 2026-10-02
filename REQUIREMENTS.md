@@ -84,7 +84,8 @@ Port `URLSourceDetector` rule for rule:
 
 ### 10. Save detail
 - Media runs edge to edge under the status bar with a scrim, at the content type's aspect ratio (video 16:9, article 16:10, product and music 1:1, else 4:3). Text-only saves start below the top bar.
-- Source, and a category picker that sticks. Title (serif for articles), author, a big **Open original** button (links open in their own app when one is installed, otherwise in the browser), summary, description, #tags.
+- Source, and a category picker that sticks. Title (serif for articles) up to 3 lines with an ellipsis, all of it on a tap (X posts arrive with the whole post as their title). Author, summary, description, #tags.
+- A big **Open original** button pinned to the bottom of the screen, over the content, so a long title or description never pushes it out of sight (links open in their own app when one is installed, otherwise in the browser).
 - Footer: "Getting details…" or "Details couldn't be loaded. The link is saved.", then "Saved 2 days ago" and the URL (selectable).
 - Opening marks the save as seen. Share and Delete (confirmed: "Delete this save? It will be removed from your stash for good.") are in the top bar.
 
