@@ -7,6 +7,8 @@ struct SaveDetailView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
     @State private var confirmingDelete = false
+    // X posts arrive with the whole post as their title: three lines, and the rest on a tap.
+    @State private var titleExpanded = false
 
     var body: some View {
         ScrollView {
@@ -24,17 +26,6 @@ struct SaveDetailView: View {
 
                 VStack(alignment: .leading, spacing: Spacing.l) {
                     header
-
-                    // Universal links hand YouTube, Spotify, Maps etc. to their apps; everything else opens in Safari.
-                    Button {
-                        openURL(save.url)
-                    } label: {
-                        Label("Open Original", systemImage: "arrow.up.right")
-                            .font(.headline)
-                            .frame(maxWidth: .infinity)
-                    }
-                    .buttonStyle(.glassProminent)
-                    .controlSize(.large)
 
                     if let summary = save.summary {
                         VStack(alignment: .leading, spacing: Spacing.xs) {
@@ -60,6 +51,21 @@ struct SaveDetailView: View {
                 .padding(.horizontal, Spacing.l)
             }
             .padding(.bottom, Spacing.xl)
+        }
+        // What a save is for: pinned at the bottom, never pushed out of sight by a long title.
+        // Universal links hand YouTube, Spotify, Maps etc. to their apps; everything else opens in Safari.
+        .safeAreaBar(edge: .bottom) {
+            Button {
+                openURL(save.url)
+            } label: {
+                Label("Open Original", systemImage: "arrow.up.right")
+                    .font(.headline)
+                    .frame(maxWidth: .infinity)
+            }
+            .buttonStyle(.glassProminent)
+            .controlSize(.large)
+            .padding(.horizontal, Spacing.l)
+            .padding(.bottom, Spacing.xs)
         }
         // Media runs edge to edge under the floating glass bar; text-only saves start below it.
         .ignoresSafeArea(edges: save.showsMedia ? .top : [])
@@ -112,6 +118,8 @@ struct SaveDetailView: View {
             Text(save.displayTitle)
                 .font(.title.bold())
                 .fontDesign(save.contentType == .article ? .serif : nil)
+                .lineLimit(titleExpanded ? nil : 3)
+                .onTapGesture { withAnimation(.stash) { titleExpanded.toggle() } }
                 .accessibilityAddTraits(.isHeader)
 
             if let author = save.author {
