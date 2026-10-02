@@ -58,7 +58,9 @@ struct SaveDetailView: View {
             Button {
                 openURL(save.url)
             } label: {
-                Label("Open Original", systemImage: "arrow.up.right")
+                // Links to a known app say so, with its symbol.
+                let inApp = save.source != .web && save.source != .unknown
+                Label(inApp ? "Open in \(save.source.displayName)" : "Open Original", systemImage: inApp ? save.source.symbol : "arrow.up.right")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
             }
