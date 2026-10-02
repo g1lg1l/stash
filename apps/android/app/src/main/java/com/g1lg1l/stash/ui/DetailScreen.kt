@@ -78,6 +78,7 @@ import com.g1lg1l.stash.data.Category
 import com.g1lg1l.stash.data.ContentType
 import com.g1lg1l.stash.data.Save
 import com.g1lg1l.stash.data.SaveStatus
+import com.g1lg1l.stash.data.Source
 import com.g1lg1l.stash.data.Stash
 import com.g1lg1l.stash.data.displayName
 import com.g1lg1l.stash.data.displayTitle
@@ -169,10 +170,12 @@ fun DetailScreen(save: Save?) {
                 .windowInsetsPadding(WindowInsets.navigationBars)
                 .padding(horizontal = Spacing.l, vertical = Spacing.m),
         ) {
+            // Links to a known app say so, with its icon.
+            val app = save.source != Source.WEB && save.source != Source.UNKNOWN
             Button({ context.openOriginal(save) }, Modifier.fillMaxWidth().height(56.dp)) {
-                Icon(painterResource(R.drawable.ic_open_in_new), contentDescription = null, modifier = Modifier.size(20.dp))
+                Icon(painterResource(if (app) save.source.icon else R.drawable.ic_open_in_new), contentDescription = null, modifier = Modifier.size(20.dp))
                 Spacer(Modifier.size(Spacing.xs))
-                Text("Open original", style = MaterialTheme.typography.titleMedium)
+                Text(if (app) "Open in ${save.source.displayName}" else "Open original", style = MaterialTheme.typography.titleMedium)
             }
         }
 
