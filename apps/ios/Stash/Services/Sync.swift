@@ -19,6 +19,9 @@ final class Account {
         var refreshToken: String
         var expiresAt: Date
         var email: String
+        /// Kept by the server in the account's user metadata; sign-in and each refresh bring back what another device set.
+        /// Optional, so sessions stored before it still decode.
+        var smartCategories: Bool?
     }
 
     private(set) var session = Keychain.load() {
@@ -72,6 +75,16 @@ final class Account {
         pullCursor = nil
         lastSyncedAt = nil
         lastError = notice
+    }
+
+    /// Smart categories run on the server, so the choice lives with the account, where every device sees it.
+    func setSmartCategories(_ on: Bool) async {
+        do {
+            _ = try await send("PUT", "auth/v1/user", body: JSONEncoder().encode(["data": ["smart_categories": on]]))
+            session?.smartCategories = on
+        } catch {
+            lastError = error.localizedDescription
+        }
     }
 
     /// Deletes the account and the server's copy. The saves stay on this iPhone.
@@ -205,7 +218,11 @@ final class Account {
     /// nil when the answer has no session: sign-up while email confirmation is on.
     private nonisolated static func session(from data: Data, email: String) throws -> Session? {
         struct Body: Decodable {
-            struct User: Decodable { let email: String? }
+            struct User: Decodable {
+                struct Metadata: Decodable { let smart_categories: Bool? }
+                let email: String?
+                let user_metadata: Metadata?
+            }
             let access_token, refresh_token: String?
             let expires_at: TimeInterval?
             let user: User?
@@ -213,7 +230,7 @@ final class Account {
         let body = try JSONDecoder().decode(Body.self, from: data)
         guard let access = body.access_token, let refresh = body.refresh_token else { return nil }
         return Session(accessToken: access, refreshToken: refresh, expiresAt: Date(timeIntervalSince1970: body.expires_at ?? 0),
-                       email: body.user?.email ?? email)
+                       email: body.user?.email ?? email, smartCategories: body.user?.user_metadata?.smart_categories ?? false)
     }
 }
 
