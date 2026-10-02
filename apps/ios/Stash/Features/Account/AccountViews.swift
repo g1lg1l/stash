@@ -57,7 +57,8 @@ struct AuthView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
-    private var canSubmit: Bool { !working && email.contains("@") && password.count >= 6 }
+    // Accounts made before the minimum went up to 8 still sign in with 6.
+    private var canSubmit: Bool { !working && email.contains("@") && password.count >= (creating ? 8 : 1) }
 
     var body: some View {
         Form {
@@ -82,7 +83,7 @@ struct AuthView: View {
                 if let message {
                     Text(message)
                 } else if creating {
-                    Text("At least 6 characters.")
+                    Text("At least 8 characters.")
                 }
             }
 
