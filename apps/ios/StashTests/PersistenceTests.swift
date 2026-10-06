@@ -55,6 +55,18 @@ struct PersistenceTests {
         #expect(Set(urls).count == urls.count)
     }
 
+    @Test func appGroupComesFromTheProfile() {
+        let plist = """
+            <?xml version="1.0" encoding="UTF-8"?><plist version="1.0"><dict><key>Entitlements</key><dict>\
+            <key>com.apple.security.application-groups</key><array><string>group.com.g1lg1l.stash.ABCDE12345</string></array>\
+            </dict></dict></plist>
+            """
+        let profile = Data([0x30, 0x82, 0x00]) + Data(plist.utf8) + Data([0xA0, 0x00])
+        #expect(ModelContainer.provisionedAppGroup(profile) == "group.com.g1lg1l.stash.ABCDE12345")
+        #expect(ModelContainer.provisionedAppGroup(Data("not a profile".utf8)) == nil)
+        #expect(ModelContainer.provisionedAppGroup(nil) == nil)
+    }
+
     @Test func appGroupContainerIsReachable() {
         #expect(FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: ModelContainer.appGroupID) != nil)
     }

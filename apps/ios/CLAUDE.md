@@ -16,6 +16,21 @@ xcrun devicectl device install app --device <UDID> <dir>/Build/Products/Debug-ip
 
 Bump `CURRENT_PROJECT_VERSION` (project level, shared by all targets) for each build installed on the phone, so *Settings → Version* tells builds apart.
 
+## Release
+
+Each GitHub release carries two .ipa files next to the APK, ad-hoc signed with the entitlements so AltStore and Sideloadly know which App Group to register when they re-sign (`appGroupID` then reads the renamed group from the profile). A free Apple ID allows 3 apps *and* extensions at once, so `stash-free.ipa` keeps only the share extension.
+
+```sh
+OUT=<dir>; APP=$OUT/Stash.xcarchive/Products/Applications/Stash.app
+xcodebuild archive -project Stash.xcodeproj -scheme Stash -destination 'generic/platform=iOS' -archivePath $OUT/Stash.xcarchive CODE_SIGNING_ALLOWED=NO
+for x in StashActionExtension StashShareExtension StashWidget; do codesign -f -s - --entitlements $x/$x.entitlements $APP/PlugIns/$x.appex; done
+codesign -f -s - --entitlements Stash/Stash.entitlements $APP
+mkdir -p $OUT/Payload && cp -R $APP $OUT/Payload/ && (cd $OUT && zip -qry stash.ipa Payload)
+rm -r $OUT/Payload/Stash.app/PlugIns/{StashActionExtension,StashWidget}.appex
+codesign -f -s - --entitlements Stash/Stash.entitlements $OUT/Payload/Stash.app && (cd $OUT && zip -qry stash-free.ipa Payload)
+gh release upload <tag> $OUT/stash.ipa $OUT/stash-free.ipa
+```
+
 ## Layout
 
 ```

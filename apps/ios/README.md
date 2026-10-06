@@ -36,7 +36,35 @@ Stash never asks for an account. If you want your saves on more than one device,
 
 ## Install
 
-There's no iPhone release yet: no App Store or TestFlight build, since both need the paid Apple Developer Program. Build it from this repo on your Mac instead.
+Stash isn't on the App Store, and iOS only installs apps from a website for developers Apple has approved. So the [latest release](https://github.com/g1lg1l/stash/releases/latest) has an .ipa file that you install with **AltStore** or **Sideloadly**: they sign it with your own Apple ID. It needs iOS 26 or later and a Mac or Windows computer.
+
+Pick the file for your Apple ID:
+
+- **[stash-free.ipa](https://github.com/g1lg1l/stash/releases/latest/download/stash-free.ipa)** for a free Apple ID. A free ID runs at most 3 apps and app extensions at a time (AltStore counts as one), so this one keeps only the share sheet: no **Save to Stash** action and no widget. It stops opening after 7 days until you refresh it.
+- **[stash.ipa](https://github.com/g1lg1l/stash/releases/latest/download/stash.ipa)** for a paid Apple Developer account: everything, for a year.
+
+Refreshing or installing a newer .ipa the same way keeps your saves.
+
+### With AltStore
+
+Use AltStore Classic, not AltStore PAL (the EU store only installs apps Apple has checked).
+
+1. Install AltServer from [altstore.io](https://altstore.io) on the computer, connect the iPhone with a cable and tap **Trust**.
+2. In AltServer's menu choose **Install AltStore**, pick the iPhone and sign in with your Apple ID.
+3. On the iPhone, trust your Apple ID in *Settings → General → VPN & Device Management*, then turn on *Settings → Privacy & Security → Developer Mode* and restart.
+4. Download the .ipa in Safari on the iPhone. Open AltStore, tap **My Apps → +** and pick it from *Downloads*.
+
+AltStore refreshes Stash by itself while AltServer runs on the same Wi-Fi. If it doesn't, open AltStore and tap **Refresh All** before the 7 days are up.
+
+### With Sideloadly
+
+1. Install Sideloadly from [sideloadly.io](https://sideloadly.io) on the computer, connect the iPhone with a cable and tap **Trust**.
+2. Drag the .ipa onto Sideloadly, enter your Apple ID and click **Start**.
+3. On the iPhone, trust your Apple ID in *Settings → General → VPN & Device Management*, then turn on *Settings → Privacy & Security → Developer Mode* and restart.
+
+With a free Apple ID, run Sideloadly again before the 7 days are up, or turn on its automatic refresh.
+
+### Build it yourself
 
 You need a Mac with Xcode 27+, an iPhone on iOS 26+, and an Apple ID (a free one works).
 

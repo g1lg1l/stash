@@ -3,7 +3,22 @@ import OSLog
 import SwiftData
 
 extension ModelContainer {
-    static let appGroupID = "group.com.g1lg1l.stash"
+    /// AltStore and Sideloadly re-sign the release .ipa under the installer's team, which renames the group:
+    /// read it from the embedded profile. App Store builds have none.
+    static let appGroupID = provisionedAppGroup(
+        Bundle.main.url(forResource: "embedded", withExtension: "mobileprovision").flatMap { try? Data(contentsOf: $0) }
+    ) ?? "group.com.g1lg1l.stash"
+
+    /// The profile is a signed (CMS) blob with the plist inside it as plain text.
+    static func provisionedAppGroup(_ profile: Data?) -> String? {
+        guard let profile,
+              let start = profile.range(of: Data("<?xml".utf8)),
+              let end = profile.range(of: Data("</plist>".utf8), in: start.lowerBound..<profile.endIndex),
+              let plist = try? PropertyListSerialization.propertyList(from: profile[start.lowerBound..<end.upperBound], format: nil) as? [String: Any],
+              let entitlements = plist["Entitlements"] as? [String: Any]
+        else { return nil }
+        return (entitlements["com.apple.security.application-groups"] as? [String])?.first
+    }
 
     /// The single store, in the App Group container. The app writes it; the widget only reads it.
     static func stash(inMemory: Bool = false) throws -> ModelContainer {
