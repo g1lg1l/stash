@@ -1,6 +1,6 @@
 # Stash on the web
 
-Svelte 5 (runes) + Vite, plain JavaScript, no other runtime dependency. Deployed to GitHub Pages (`g1lg1l.github.io/stash/`, hence `base: '/stash/'`) by `.github/workflows/web.yml` on every push to `main` that touches `apps/web`. Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/web`.
+Svelte 5 (runes) + Vite, plain JavaScript, no other runtime dependency. Deployed to GitHub Pages (`g1lg1l.github.io/stash/`, hence `base: '/stash/'`) by `.github/workflows/release.yml` when a tag `v*` is pushed; `.github/workflows/web.yml` only tests and builds, on every push to `main` that touches `apps/web`. Repo-wide rules and the workflow are in the root `CLAUDE.md`; commands below run from `apps/web`.
 
 ```sh
 npm install

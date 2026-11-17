@@ -18,7 +18,7 @@ Bump `CURRENT_PROJECT_VERSION` (project level, shared by all targets) for each b
 
 ## Release
 
-Each GitHub release carries two .ipa files next to the APK, ad-hoc signed with the entitlements so AltStore and Sideloadly know which App Group to register when they re-sign (`appGroupID` then reads the renamed group from the profile). A free Apple ID allows 3 apps *and* extensions at once, so `stash-free.ipa` keeps only the share extension.
+Pushing a tag `v*` runs `.github/workflows/release.yml`, which does all of this on a macOS runner; the commands below are the same steps by hand. Each GitHub release carries two .ipa files next to the APK, ad-hoc signed with the entitlements so AltStore and Sideloadly know which App Group to register when they re-sign (`appGroupID` then reads the renamed group from the profile). A free Apple ID allows 3 apps *and* extensions at once, so `stash-free.ipa` keeps only the share extension.
 
 ```sh
 OUT=<dir>; APP=$OUT/Stash.xcarchive/Products/Applications/Stash.app

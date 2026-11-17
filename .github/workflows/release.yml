@@ -1,0 +1,136 @@
+# Publishes Stash when a tag v* is pushed, with the files the READMEs link to (releases/latest/download/…):
+#   Web:     tests, builds and puts apps/web on GitHub Pages (g1lg1l.github.io/stash)
+#   Android: stash.apk, the minified release build
+#   iPhone:  stash.ipa and stash-free.ipa, ad-hoc signed for AltStore and Sideloadly (apps/ios/CLAUDE.md)
+# The release starts as a draft (or one already there, with its notes, is used) and is published once
+# the site is live and all three files are attached; a failure leaves the draft.
+# By hand: gh workflow run Release -f tag=vX.Y
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Release tag to publish (it must exist)
+        required: true
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+env:
+  TAG: ${{ inputs.tag || github.ref_name }}
+  GH_TOKEN: ${{ github.token }}
+  GH_REPO: ${{ github.repository }}
+
+jobs:
+  draft:
+    runs-on: ubuntu-latest
+    steps:
+      # "v1.2.0" is "Stash 1.2.0", its notes the commits since the last release
+      - run: |
+          version="${TAG#v}"
+          gh release view "$TAG" > /dev/null 2>&1 || gh release create "$TAG" --draft --verify-tag --generate-notes --title "Stash ${version//-/ }"
+
+  web:
+    needs: draft
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: apps/web/dist
+
+  pages:
+    needs: web
+    runs-on: ubuntu-latest
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v5
+
+  android:
+    needs: draft
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/android
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      # Android only updates an app signed with the same key. With the ANDROID_DEBUG_KEYSTORE secret (a
+      # debug.keystore, base64) every release is signed alike and installs over the last one; without it
+      # the runner makes a key of its own and people have to uninstall first.
+      - name: Signing key
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_DEBUG_KEYSTORE }}
+        run: |
+          if [ -n "$KEYSTORE" ]; then
+            mkdir -p ~/.android && echo "$KEYSTORE" | base64 -d > ~/.android/debug.keystore
+          else
+            echo "::warning::ANDROID_DEBUG_KEYSTORE is not set: this APK is signed with a throwaway key and will not install over an earlier release"
+          fi
+
+      - run: ./gradlew testDebugUnitTest assembleRelease
+      - name: Attach to the release
+        run: |
+          cp app/build/outputs/apk/release/app-release.apk stash.apk
+          gh release upload "$TAG" stash.apk --clobber
+
+  ios:
+    needs: draft
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: apps/ios
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: ${{ env.TAG }}
+      # The steps of "Release" in apps/ios/CLAUDE.md: an unsigned archive, signed ad hoc with the entitlements
+      # so AltStore and Sideloadly know which App Group to register; stash-free.ipa keeps only the share extension.
+      - name: Archive
+        run: xcodebuild archive -project Stash.xcodeproj -scheme Stash -destination 'generic/platform=iOS' -archivePath "$RUNNER_TEMP/Stash.xcarchive" CODE_SIGNING_ALLOWED=NO
+      - name: Two .ipa files
+        run: |
+          OUT="$RUNNER_TEMP"; APP="$OUT/Stash.xcarchive/Products/Applications/Stash.app"
+          for x in StashActionExtension StashShareExtension StashWidget; do codesign -f -s - --entitlements "$x/$x.entitlements" "$APP/PlugIns/$x.appex"; done
+          codesign -f -s - --entitlements Stash/Stash.entitlements "$APP"
+          mkdir -p "$OUT/Payload" && cp -R "$APP" "$OUT/Payload/" && (cd "$OUT" && zip -qry stash.ipa Payload)
+          rm -r "$OUT/Payload/Stash.app/PlugIns/"{StashActionExtension,StashWidget}.appex
+          codesign -f -s - --entitlements Stash/Stash.entitlements "$OUT/Payload/Stash.app" && (cd "$OUT" && zip -qry stash-free.ipa Payload)
+      - name: Attach to the release
+        run: gh release upload "$TAG" "$RUNNER_TEMP/stash.ipa" "$RUNNER_TEMP/stash-free.ipa" --clobber
+
+  publish:
+    needs: [pages, android, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - run: gh release edit "$TAG" --draft=false

@@ -7,7 +7,7 @@ apps/ios/        iPhone app: Swift 6, SwiftUI, SwiftData, iOS 26+         (see a
 apps/android/    Android app: Kotlin, Compose, Room, Android 12+          (see apps/android/CLAUDE.md)
 apps/web/        Web client: Svelte 5 + Vite, on GitHub Pages                (see apps/web/CLAUDE.md)
 supabase/        Backend (free tier): migrations/ is the schema, tests/ the pgTAP checks, functions/ the Edge Functions
-.github/         web.yml tests, builds and deploys apps/web on every push to main
+.github/         web.yml tests and builds apps/web on every push to main; release.yml publishes on a tag v*: the web to GitHub Pages, stash.apk and both .ipa files to a GitHub release
 REQUIREMENTS.md  Features and behavior both apps implement, including how sync will work
 ```
 
