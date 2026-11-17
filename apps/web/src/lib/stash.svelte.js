@@ -97,10 +97,7 @@ async function request(method, path, { body, token, prefer } = {}) {
 
 const toSession = (json, email) =>
   json?.access_token
-    ? {
-        accessToken: json.access_token, refreshToken: json.refresh_token, expiresAt: json.expires_at, email: json.user?.email ?? email,
-        smartCategories: json.user?.user_metadata?.smart_categories === true,
-      }
+    ? { accessToken: json.access_token, refreshToken: json.refresh_token, expiresAt: json.expires_at, email: json.user?.email ?? email }
     : null
 
 let refreshing = null
@@ -159,15 +156,6 @@ export function signOut() {
 export async function deleteAccount() {
   await authorized('POST', 'rest/v1/rpc/delete_account', { body: {} })
   signOut()
-}
-
-/**
- * Smart categories run on the server, so the choice lives with the account (its user metadata), where every
- * device sees it. Sign-in and each refresh bring back what another device set.
- */
-export async function setSmartCategories(on) {
-  await authorized('PUT', 'auth/v1/user', { body: { data: { smart_categories: on } } })
-  setSession({ ...stash.session, smartCategories: on })
 }
 
 // Saves

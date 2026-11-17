@@ -58,7 +58,6 @@ Port `URLSourceDetector` rule for rule:
 - Structure first: Maps or a place → Places, Spotify or music → Music, a product → Shopping.
 - Otherwise keyword scoring, ignoring case and accents. Title words count double; description, tags, host and path count once. Same vocabulary (English plus common Italian) and the same tie order as iOS.
 - A category picked by hand (`categoryIsManual`) always wins. Enrichment only classifies saves still in "Other".
-- With **Smart categories** on (see "Smart categories" under Account and sync), the server's pick replaces the keyword one once it syncs down.
 
 ### 6. Home
 - The title greets by time of day ("Good morning", "Good afternoon", "Good evening"). The subtitle reads "12 saved · 3 unseen".
@@ -112,7 +111,7 @@ The device's own database stays the source of truth. The app works fully offline
 
 ### Signing in
 - First launch shows a welcome screen once: what Stash does, **Sign in**, **Create account** and **Not now**. Not now goes straight to Home. It is never shown again (`seenWelcome`), whatever the choice.
-- Settings → Account, signed out: "Sync your saves" with Sign in / Create account. Signed in: the email, "Last synced" (relative time, or "Syncing…", or the last error), **Smart categories** (a switch, off by default: "Gemini sorts the saves you haven't filed by hand, on every device. Their titles, descriptions and links are sent to Google."), **Sync now**, **Sign out**, **Delete account** (confirmation dialog: deletes the account and the copy on the server, keeps the saves on this device).
+- Settings → Account, signed out: "Sync your saves" with Sign in / Create account. Signed in: the email, "Last synced" (relative time, or "Syncing…", or the last error), **Sync now**, **Sign out**, **Delete account** (confirmation dialog: deletes the account and the copy on the server, keeps the saves on this device).
 - One auth screen with email and password, switching between Sign in and Create account. A new password needs 8+ characters; signing in takes any length, since accounts made before that have 6. The server's message is shown on failure (`msg`, else `error_description`, else `message` as the REST API sends it); no connection shows "Couldn't connect. Check your connection and try again." If Create account returns no session (email confirmation is on), say "Check your email to confirm, then sign in."
 - Email confirmation is off: creating an account signs the person in at once. Stash shares its Supabase project with Midori and Matcha, and a project has one sign-in setting; Midori's username accounts cannot confirm an email. The apps still handle a server that asks for confirmation ("Check your email to confirm, then sign in."), and the web client still reads a confirmation link's session or error from the fragment, so turning it back on needs no app change.
 - Sign out keeps every save on the device, forgets the session and resets both sync cursors, so the next sign-in, to any account, uploads everything again.
@@ -147,21 +146,12 @@ Local additions: `modifiedAt` on every save (set to now on every local change: a
 
 Last write to reach the server wins. Each platform keeps the pull rules (step 2) in a pure function with JVM / Swift Testing checks: skip changed-during-sync, delete, update without re-push, merge by `canonicalUrl`, insert.
 
-### Smart categories
-For people who turn it on, the server has Gemini pick a category for every save they haven't sorted by hand (#19).
-
-- The switch lives with the account, so every device and the server see it: `PUT /auth/v1/user` `{"data": {"smart_categories": true}}`. Sign-in and refresh answers carry it back in `user.user_metadata.smart_categories` (missing means off); keep that next to the session.
-- `saves.categorized_at` is the server's own column: devices never send it and ignore it on pull. Upserts that leave it out leave it alone.
-- Due: enriched or failed (pending saves are still waiting for a phone to fetch their title), not `category_is_manual`, not deleted, `categorized_at` null. pg_cron wakes the `smart-categories` Edge Function every minute while anything is due; it sends up to 50 at a time to `gemini-3.5-flash-lite` (free tier) and writes `category` and `categorized_at`. A failure (rate limit, outage) leaves them due for the next run.
-- Once the model has picked, only a pick by hand changes the category: the server keeps the model's category when a phone pushes its old one along with some other change. The devices get it on their next pull, like any other change.
-- Turning it off stops new picks; categories already picked stay.
-
 ### Web client (`apps/web`)
 - Needs an account: no local database, it reads and writes `saves` directly through the same REST API, and keeps only the session (in `localStorage`).
 - Loads every save without `deleted_at` on sign-in and when the tab comes back; changes go up at once (`PATCH` of the changed fields), and the screen rolls back if the server refuses.
 - Adding: a link pasted in the bar or anywhere on the page (⌘V), found inside text as on the phones. The same `canonical_url` as the apps; already there, it bumps `lastSavedAt`. New saves go up `pending` with category `other`: the browser can't fetch other sites, so a phone enriches and classifies them after its next pull.
 - Delete sets `deleted_at`, with Undo clearing it. Opening a save marks it seen.
-- Same screens as the apps: Home by day, Explore (Worth another look, categories), Search, the detail panel, Settings (account with Smart categories, theme).
+- Same screens as the apps: Home by day, Explore (Worth another look, categories), Search, the detail panel, Settings (account, theme).
 - Side by side, the list and the detail panel scroll on their own, each with its scrollbar at its own edge; where the panel floats over the list, the list holds still.
 
 ## Platform mapping

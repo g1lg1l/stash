@@ -29,12 +29,11 @@ All three do the same things; [REQUIREMENTS.md](REQUIREMENTS.md) is the list. Ea
 
 ## Host it yourself
 
-Everything server-side lives in [`supabase/`](supabase): the schema and its row level security, the database tests, and the `smart-categories` Edge Function that picks topics with Gemini. You can run it privately, with no account anywhere, on your own machine. You need Docker and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started):
+Everything server-side lives in [`supabase/`](supabase): the schema and its row level security, and the database tests. You can run it privately, with no account anywhere, on your own machine. You need Docker and the [Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started):
 
 ```bash
 supabase start                               # Postgres, Auth and the API in Docker, every migration applied
 supabase test db                             # the database and row level security tests
-supabase functions serve smart-categories    # reads GEMINI_STASH_API_KEY from supabase/functions/.env
 supabase stop
 ```
 
@@ -44,8 +43,6 @@ Or on a Supabase project of your own (the free plan is enough). Set `site_url` i
 supabase link --project-ref <your-project-ref>
 supabase db push                             # migrations
 supabase config push                         # auth settings
-supabase secrets set GEMINI_STASH_API_KEY=<your Gemini API key>
-supabase functions deploy smart-categories
 ```
 
 Then point the apps at your backend with its URL and publishable key:
@@ -53,7 +50,6 @@ Then point the apps at your backend with its URL and publishable key:
 - **Web**: `VITE_SUPABASE_URL` and `VITE_SUPABASE_KEY` in `apps/web/.env.local`.
 - **Android**: the URL and `KEY` in `apps/android/app/src/main/java/com/g1lg1l/stash/data/Sync.kt`.
 - **iPhone**: `baseURL` and `publishableKey` in `apps/ios/Stash/Services/Sync.swift`.
-- **Smart topics**: the `smart-categories` cron job calls the function on this project's URL. Add a migration that runs `cron.schedule('smart-categories', …)` again with your project's URL.
 
 ## License
 

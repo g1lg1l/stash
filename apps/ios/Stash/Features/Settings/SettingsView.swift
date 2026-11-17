@@ -93,10 +93,6 @@ struct SettingsView: View {
                         Text("Never")
                     }
                 }
-                Toggle(isOn: Binding(get: { session.smartCategories ?? false },
-                                     set: { on in Task { await account.setSmartCategories(on) } })) {
-                    Label("Smart Categories", systemImage: "sparkles")
-                }
                 Button("Sync Now", systemImage: "arrow.triangle.2.circlepath") {
                     Task { await account.sync(modelContext) }
                 }
@@ -110,9 +106,7 @@ struct SettingsView: View {
         } header: {
             Text("Account")
         } footer: {
-            if account.isSignedIn {
-                Text("Smart Categories: Gemini sorts the saves you haven't filed by hand, on every device. Their titles, descriptions and links are sent to Google.")
-            } else {
+            if !account.isSignedIn {
                 Text(account.lastError ?? "Sync your saves across your devices. Optional: Stash works the same without an account.")
             }
         }
