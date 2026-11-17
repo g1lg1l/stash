@@ -117,8 +117,8 @@ class ServerError(val code: Int, message: String) : Exception(message)
  * row level security protects the data. Signed in while there's a refresh token in [Prefs].
  */
 object Account {
-    val base = "https://kzgmhvqbvrylwydqskcm.supabase.co".toHttpUrl()
-    private const val KEY = "sb_publishable_dCk3njz-F4vws7Y5ky6XNA__pOe081Z"
+    val base = "https://yuapnmbvkmdjsgccqlgx.supabase.co".toHttpUrl()
+    private const val KEY = "sb_publishable_zxABfHtOoX6APrT9eDi-LQ_rtBGI1nm"
     private val json = "application/json".toMediaType()
 
     val signedIn: Boolean get() = Prefs.refreshToken != null

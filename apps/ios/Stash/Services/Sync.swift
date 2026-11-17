@@ -10,8 +10,8 @@ final class Account {
     static let shared = Account()
 
     // Public by design: row level security protects the data.
-    private nonisolated static let baseURL = "https://kzgmhvqbvrylwydqskcm.supabase.co"
-    private nonisolated static let publishableKey = "sb_publishable_dCk3njz-F4vws7Y5ky6XNA__pOe081Z"
+    private nonisolated static let baseURL = "https://yuapnmbvkmdjsgccqlgx.supabase.co"
+    private nonisolated static let publishableKey = "sb_publishable_zxABfHtOoX6APrT9eDi-LQ_rtBGI1nm"
     private nonisolated static let http = URLSession(configuration: .ephemeral) // Never a cached pull.
 
     struct Session: Codable {

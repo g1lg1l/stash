@@ -4,8 +4,8 @@ import { analyze, pastedLink } from './links.js'
 
 // Public by design: row level security protects the data. A `.env.local` can point `npm run dev` at
 // the local stack (`supabase start`): VITE_SUPABASE_URL=http://127.0.0.1:54321 and its VITE_SUPABASE_KEY.
-const base = import.meta.env.VITE_SUPABASE_URL ?? 'https://kzgmhvqbvrylwydqskcm.supabase.co'
-const key = import.meta.env.VITE_SUPABASE_KEY ?? 'sb_publishable_dCk3njz-F4vws7Y5ky6XNA__pOe081Z'
+const base = import.meta.env.VITE_SUPABASE_URL ?? 'https://yuapnmbvkmdjsgccqlgx.supabase.co'
+const key = import.meta.env.VITE_SUPABASE_KEY ?? 'sb_publishable_zxABfHtOoX6APrT9eDi-LQ_rtBGI1nm'
 
 function loadSession() {
   try {
